@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TimeSheet Pro">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="shortcut icon" href="favicon.ico">
+<title>TimeSheet Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&family=Montserrat:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#0d0f14;--surface:#161820;--surface2:#1e2028;--border:#2a2d38;
+  --accent:#f0c040;--accent2:#4af0b0;--accent3:#f06080;--text:#e8eaf0;--muted:#6b7080;--radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:0 0 120px;}
+
+/* NAV TABS */
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:90;overflow-x:auto;scrollbar-width:none;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{padding:10px 18px;font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.2s;}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+
+/* SETUP */
+#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.setup-box{background:var(--surface);border:1.5px solid var(--accent);border-radius:18px;padding:28px 24px;max-width:460px;width:100%;}
+.setup-box h2{font-size:1.3rem;font-weight:800;margin-bottom:6px;}
+.setup-box h2 span{color:var(--accent);}
+.setup-box p{font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.step-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px;font-size:0.78rem;line-height:1.65;}
+.step-num{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#0d0f14;font-weight:800;border-radius:50%;width:20px;height:20px;font-size:0.68rem;margin-right:8px;flex-shrink:0;}
+.step-block code{background:var(--surface2);color:var(--accent2);padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.74rem;}
+.step-block a{color:var(--accent);}
+.setup-inp{margin-top:14px;display:flex;flex-direction:column;gap:9px;}
+.setup-inp input{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:11px 14px;font-family:'DM Mono',monospace;font-size:0.82rem;outline:none;width:100%;}
+.setup-inp input:focus{border-color:var(--accent);}
+.btn-setup{background:var(--accent);color:#0d0f14;border:none;border-radius:8px;padding:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;width:100%;}
+.setup-skip{text-align:center;margin-top:10px;font-size:0.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;}
+.show-code-link{text-align:center;margin-top:8px;font-size:0.72rem;color:var(--accent2);cursor:pointer;text-decoration:underline;}
+
+/* SYNC BADGE */
+#sync-badge{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--border);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.sync-dot.ok{background:var(--accent2);}.sync-dot.err{background:var(--accent3);}
+.sync-dot.spin{animation:pulse 1s infinite;background:var(--accent);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.logo{font-size:1.15rem;font-weight:800;letter-spacing:-0.5px;}.logo span{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.week-label{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);text-align:right;}
+
+/* QUICK ENTRY */
+.quick-bar{background:var(--surface);margin:14px 14px 0;border-radius:var(--radius);border:1.5px solid var(--accent);padding:14px 16px;}
+.quick-bar label{font-size:0.65rem;letter-spacing:2px;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:10px;font-weight:700;}
+.quick-row{display:flex;gap:8px;flex-wrap:wrap;}
+.quick-row input,.quick-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+.quick-row input:focus,.quick-row select:focus{border-color:var(--accent);}
+#inp-customer{flex:1;min-width:130px;}#inp-hours{width:80px;}#inp-date{width:148px;}
+.note-wrap{display:flex;gap:6px;flex:2;min-width:120px;}
+#inp-note{flex:1;min-width:0;}
+.btn-mic{background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:42px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:1.1rem;padding:0;}
+.btn-mic:hover{border-color:var(--accent);color:var(--accent);}
+.btn-mic.listening{background:var(--accent3);border-color:var(--accent3);color:#fff;animation:micpulse 0.8s infinite;}
+.btn-mic.granted{border-color:var(--accent2);color:var(--accent2);}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(240,96,128,0.5)}50%{box-shadow:0 0 0 6px rgba(240,96,128,0);}}
+.btn-add{background:var(--accent);color:#0d0f14;border:none;border-radius:8px;padding:10px 20px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;white-space:nowrap;}
+.btn-add:active{transform:scale(0.96);opacity:0.85;}
+.voice-hint{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin:7px 16px 0;}
+
+/* STATS */
+.stats-row{display:flex;gap:10px;padding:14px 14px 0;overflow-x:auto;scrollbar-width:none;}
+.stats-row::-webkit-scrollbar{display:none;}
+.stat-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:13px 16px;min-width:120px;flex-shrink:0;}
+.stat-card .val{font-size:1.7rem;font-weight:800;line-height:1;margin-bottom:3px;}
+.stat-card .lbl{font-size:0.6rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
+.stat-card.yellow .val{color:var(--accent);}
+.stat-card.green .val{color:var(--accent2);}
+.stat-card.red .val{color:var(--accent3);}
+.stat-card.blue .val{color:#80c8ff;}
+
+/* SECTION TITLE */
+.section-title{font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:18px 16px 10px;font-weight:700;display:flex;align-items:center;justify-content:space-between;padding-right:16px;}
+
+/* CUSTOMER BARS */
+.customer-bars{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.cust-row{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:11px 14px;display:flex;align-items:center;gap:12px;}
+.cust-name{font-weight:700;font-size:0.85rem;width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cust-bar-wrap{flex:1;background:var(--bg);border-radius:4px;height:8px;overflow:hidden;}
+.cust-bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.cust-hours{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent);width:55px;text-align:right;flex-shrink:0;}
+.cust-pct{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);width:38px;text-align:right;flex-shrink:0;}
+
+/* DONUT CHART */
+.chart-wrap{padding:0 14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.donut-svg{flex-shrink:0;}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1;min-width:140px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:0.78rem;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-name{flex:1;font-weight:600;font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.legend-val{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);}
+
+/* MONTHLY TREND CHART */
+.trend-wrap{padding:0 14px;}
+.trend-chart{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px;overflow-x:auto;}
+.bar-chart-inner{display:flex;align-items:flex-end;gap:6px;height:120px;min-width:280px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:32px;}
+.bar-col-fill{width:100%;border-radius:4px 4px 0 0;transition:height 0.4s ease;min-height:2px;}
+.bar-col-lbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);white-space:nowrap;}
+.bar-col-val{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent);}
+
+/* TABLE */
+.log-wrap{padding:0 14px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:0.78rem;}
+th{text-align:left;color:var(--muted);font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);padding:8px 10px;}
+td{padding:9px 10px;border-bottom:1px solid var(--surface2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:var(--surface2);}
+.td-act{cursor:pointer;color:var(--muted);text-align:center;transition:color 0.15s;font-size:0.85rem;}
+.td-act:hover{color:var(--accent);}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:600;}
+
+/* FILTERS */
+.filter-row{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap;}
+.filter-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:0.78rem;outline:none;}
+.btn-export{background:var(--surface2);color:var(--accent2);border:1px solid var(--accent2);border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;}
+
+/* REPORT TAB */
+.report-wrap{padding:0 14px;}
+.report-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.report-controls select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;}
+.btn-print{background:var(--accent);color:#0d0f14;border:none;border-radius:8px;padding:8px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;}
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.report-card h3{font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.report-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:0.8rem;}
+.report-table th{text-align:left;color:var(--muted);font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);padding:6px 8px;}
+.report-table td{padding:8px 8px;border-bottom:1px solid var(--surface2);}
+.report-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--accent);}
+.report-total{font-size:1.4rem;font-weight:800;color:var(--accent);}
+.report-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+
+/* EMPTY */
+.empty{text-align:center;color:var(--muted);padding:30px 20px;font-size:0.85rem;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#0d0f14;padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.85rem;z-index:999;transition:transform 0.3s ease;pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border-radius:18px 18px 0 0;border:1px solid var(--border);border-bottom:none;padding:24px 20px 40px;width:100%;max-width:480px;}
+.modal h3{font-size:1rem;font-weight:700;margin-bottom:14px;}
+.modal input,.modal select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:10px;}
+.modal-btns{display:flex;gap:10px;}
+.btn-modal-add{flex:1;background:var(--accent);color:#0d0f14;border:none;border-radius:8px;padding:10px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;}
+.btn-modal-close{flex:1;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;}
+.cust-list-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:0.82rem;}
+.cust-list-item span{flex:1;}
+.cust-list-item button{background:none;border:none;color:var(--accent3);cursor:pointer;}
+textarea.code-area{width:100%;height:240px;background:var(--bg);color:var(--accent2);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'DM Mono',monospace;font-size:0.68rem;resize:none;outline:none;margin-bottom:10px;}
+
+/* ═══ APPEARANCE SETTINGS ═══ */
+.appear-section{margin-bottom:22px;}
+.appear-section h4{font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:700;}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.theme-swatch{border-radius:10px;padding:10px 8px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;text-align:center;}
+.theme-swatch.active{border-color:var(--accent);}
+.theme-swatch .sw-name{font-size:0.65rem;font-weight:700;margin-top:5px;}
+.theme-swatch .sw-dots{display:flex;gap:3px;justify-content:center;margin-top:3px;}
+.theme-swatch .sw-dot{width:8px;height:8px;border-radius:50%;}
+.font-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.font-swatch{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color 0.2s;}
+.font-swatch.active{border-color:var(--accent);}
+.font-swatch .fs-name{font-size:0.7rem;color:var(--muted);margin-bottom:2px;}
+.font-swatch .fs-sample{font-size:1rem;font-weight:700;}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.color-chip{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
+.color-chip.active{border-color:var(--text);transform:scale(1.18);}
+.custom-color{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.custom-color input[type=color]{width:40px;height:32px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:2px;}
+.custom-color label{font-size:0.72rem;color:var(--muted);}
+.range-row{display:flex;align-items:center;gap:12px;}
+.range-row input[type=range]{flex:1;accent-color:var(--accent);}
+.range-row .rv{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent);width:36px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:0.82rem;font-weight:600;}
+.setting-sub{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.toggle{width:44px;height:24px;background:var(--surface2);border-radius:12px;cursor:pointer;position:relative;border:1px solid var(--border);transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:var(--accent2);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 0.2s;}
+.toggle.on::after{transform:translateX(20px);}
+.app-name-input{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:0.85rem;font-weight:700;outline:none;width:100%;}
+.app-name-input:focus{border-color:var(--accent);}
+.appear-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px;text-align:center;}
+.appear-preview .pv-title{font-size:1.1rem;font-weight:800;}.appear-preview .pv-title span{color:var(--accent);}
+.appear-preview .pv-sub{font-size:0.7rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;}
+.appear-preview .pv-badge{display:inline-block;margin-top:8px;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+body.compact .stat-card{padding:8px 12px;min-width:100px;}
+body.compact .stat-card .val{font-size:1.3rem;}
+body.compact .cust-row{padding:7px 12px;}
+body.compact td,body.compact th{padding:5px 8px;}
+body.compact .quick-bar{padding:10px 12px;}
+
+@media print{
+  header,.nav-tabs,.quick-bar,.voice-hint,.stats-row,.filter-row,#toast,.modal-bg,#setup-screen,.btn-print,.btn-export{display:none!important;}
+  body{background:#fff;color:#000;padding:0;}
+  .report-card{border:1px solid #ccc;background:#fff;break-inside:avoid;}
+  .report-table td,.report-table th{color:#000;}
+  #tab-report{display:block!important;}
+}
+
+@media(max-width:480px){
+  .quick-row{flex-direction:column;}
+  #inp-customer,#inp-hours,#inp-date,.note-wrap{width:100%;}
+  .btn-add{width:100%;padding:12px;}
+  .chart-wrap{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <h2>Time<span>Sheet</span> Pro Setup</h2>
+    <p>Connect to Google Sheets so your data syncs between all your devices. One-time setup, ~5 minutes.</p>
+    <div class="step-block"><span class="step-num">1</span>Open your Google Sheet → <b>Extensions → Apps Script</b> → paste the code → Save</div>
+    <div class="step-block"><span class="step-num">2</span>Click <b>Deploy → New deployment → Web App</b> → Execute as: Me, Access: Anyone → Deploy → copy the <code>/exec</code> URL</div>
+    <div class="step-block"><span class="step-num">3</span>Paste the URL below and click Connect</div>
+    <div class="show-code-link" onclick="document.getElementById('code-modal').classList.add('open')">📋 Show Apps Script code</div>
+    <div class="setup-inp">
+      <input id="setup-url" type="url" placeholder="https://script.google.com/macros/s/…/exec">
+      <button class="btn-setup" onclick="completeSetup()">Connect &amp; Start →</button>
+    </div>
+    <div class="setup-skip" onclick="skipSetup()">Skip — use offline only</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+    <div class="logo">Time<span>Sheet</span></div>
+    <div style="font-size:0.52rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Created &amp; owned by <span style="color:var(--text);font-weight:600">Carlos de Oliveira</span></div>
+  </div>
+  <div class="header-right">
+    <div id="sync-badge" onclick="manualSync()" title="Tap to sync">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-text">offline</span>
+    </div>
+    <div>
+      <div class="week-label" id="week-label"></div>
+      <div class="week-label" id="month-label"></div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="nav-tab" onclick="switchTab('charts')">Charts</div>
+  <div class="nav-tab" onclick="switchTab('log')">Log</div>
+  <div class="nav-tab" onclick="switchTab('report')">Report</div>
+  <div class="nav-tab" onclick="switchTab('settings')">Settings</div>
+</div>
+
+<!-- ══ TAB: DASHBOARD ══ -->
+<div class="tab-panel active" id="tab-dashboard">
+  <div class="quick-bar">
+    <label>⚡ Quick Entry</label>
+    <div class="quick-row">
+      <select id="inp-customer"><option value="">— Customer —</option></select>
+      <input id="inp-hours" type="number" min="0.25" max="24" step="0.25" placeholder="Hours">
+      <input id="inp-date" type="date">
+      <div class="note-wrap">
+        <input id="inp-note" type="text" placeholder="Note (optional)">
+        <button class="btn-mic" id="btn-mic" onclick="toggleMic()" title="Tap to dictate note">🎙️</button>
+      </div>
+      <button class="btn-add" onclick="addEntry()">+ Log</button>
+    </div>
+  </div>
+  <div class="voice-hint">🎙️ Tap the mic to dictate your note by voice.</div>
+
+  <div class="stats-row">
+    <div class="stat-card yellow"><div class="val" id="stat-today">0h</div><div class="lbl">Today</div></div>
+    <div class="stat-card green"><div class="val" id="stat-week">0h</div><div class="lbl">This Week</div></div>
+    <div class="stat-card red"><div class="val" id="stat-month">0h</div><div class="lbl">This Month</div></div>
+    <div class="stat-card blue"><div class="val" id="stat-year">0h</div><div class="lbl">This Year</div></div>
+    <div class="stat-card" style="cursor:pointer;border-color:var(--muted)" onclick="openModal()">
+      <div class="val" style="font-size:1.3rem;color:var(--muted)">⚙</div>
+      <div class="lbl">Customers</div>
+    </div>
+  </div>
+
+  <div class="section-title"><span>Customer Allocation — This Month</span></div>
+  <div class="customer-bars" id="customer-bars"></div>
+
+  <div class="section-title"><span>Recent Entries</span></div>
+  <div class="log-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Hours</th><th>Note</th><th></th><th></th></tr></thead>
+      <tbody id="recent-body"></tbody>
+    </table>
+    <div class="empty" id="recent-empty" style="display:none">No entries yet.</div>
+  </div>
+</div>
+
+<!-- ══ TAB: CHARTS ══ -->
+<div class="tab-panel" id="tab-charts">
+  <div class="section-title"><span>Hours by Customer</span><span id="charts-period-label" style="color:var(--accent);font-size:0.65rem"></span></div>
+  <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <select id="chart-period" onchange="renderCharts()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:0.78rem;outline:none;">
+      <option value="month">This Month</option>
+      <option value="year" selected>This Year (2026)</option>
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  <!-- DONUT -->
+  <div class="chart-wrap" id="donut-wrap"></div>
+
+  <!-- MONTHLY TREND -->
+  <div class="section-title"><span>Monthly Trend — 2026</span></div>
+  <div class="trend-wrap">
+    <div class="trend-chart">
+      <div class="bar-chart-inner" id="trend-bars"></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER BREAKDOWN -->
+  <div class="section-title"><span>Customer Breakdown</span></div>
+  <div class="customer-bars" id="chart-bars"></div>
+</div>
+
+<!-- ══ TAB: LOG ══ -->
+<div class="tab-panel" id="tab-log">
+  <div class="filter-row" style="padding-top:14px">
+    <select id="filter-customer" onchange="renderTable()"><option value="">All Customers</option></select>
+    <select id="filter-period" onchange="renderTable()">
+      <option value="all">All Time</option>
+      <option value="week">This Week</option>
+      <option value="month" selected>This Month</option>
+      <option value="year">This Year</option>
+    </select>
+    <button class="btn-export" onclick="exportCSV()">↓ CSV</button>
+  </div>
+  <div class="log-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Hours</th><th>Note</th><th></th><th></th></tr></thead>
+      <tbody id="log-body"></tbody>
+    </table>
+    <div class="empty" id="empty-msg" style="display:none">No entries for this filter.</div>
+  </div>
+</div>
+
+<!-- ══ TAB: REPORT ══ -->
+<div class="tab-panel" id="tab-report">
+  <div style="padding:14px 14px 0">
+    <div class="report-controls">
+      <select id="report-year" onchange="renderReport()">
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+      </select>
+      <select id="report-month" onchange="renderReport()">
+        <option value="all">Full Year</option>
+        <option value="01">January</option><option value="02">February</option>
+        <option value="03">March</option><option value="04">April</option>
+        <option value="05">May</option><option value="06" selected>June</option>
+        <option value="07">July</option><option value="08">August</option>
+        <option value="09">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
+    </div>
+    <div id="report-content"></div>
+  </div>
+</div>
+
+<!-- ══ TAB: SETTINGS ══ -->
+<div class="tab-panel" id="tab-settings">
+  <div style="padding:14px">
+
+    <!-- LIVE PREVIEW -->
+    <div class="appear-preview" id="appear-preview">
+      <div class="pv-title" id="pv-title">Time<span>Sheet</span></div>
+      <div class="pv-sub">Preview updates live as you change settings</div>
+      <div class="pv-badge" id="pv-badge" style="background:var(--accent)22;color:var(--accent)">Accent Color</div>
+    </div>
+
+    <!-- APP NAME -->
+    <div class="report-card">
+      <div class="appear-section">
+        <h4>App Name</h4>
+        <input class="app-name-input" id="app-name-input" type="text" placeholder="TimeSheet Pro" oninput="applyAppName(this.value)">
+      </div>
+    </div>
+
+    <!-- THEMES -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Theme</h4>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+
+      <!-- ACCENT COLOR -->
+      <div class="appear-section">
+        <h4>Accent Color</h4>
+        <div class="color-row" id="accent-chips"></div>
+        <div class="custom-color">
+          <input type="color" id="custom-accent" oninput="setAccent(this.value)">
+          <label>Custom color</label>
+        </div>
+      </div>
+
+      <!-- FONT -->
+      <div class="appear-section">
+        <h4>Font</h4>
+        <div class="font-grid" id="font-grid"></div>
+      </div>
+
+      <!-- BORDER RADIUS -->
+      <div class="appear-section">
+        <h4>Corner Radius</h4>
+        <div class="range-row">
+          <input type="range" min="0" max="24" step="2" id="radius-range" oninput="setRadius(this.value)">
+          <span class="rv" id="radius-val">12px</span>
+        </div>
+      </div>
+
+      <!-- FONT SIZE -->
+      <div class="appear-section">
+        <h4>Base Font Size</h4>
+        <div class="range-row">
+          <input type="range" min="12" max="18" step="1" id="fontsize-range" oninput="setFontSize(this.value)">
+          <span class="rv" id="fontsize-val">14px</span>
+        </div>
+      </div>
+
+      <!-- TOGGLES -->
+      <div class="appear-section">
+        <h4>Interface Options</h4>
+        <div class="setting-row">
+          <div><div class="setting-label">Compact Mode</div><div class="setting-sub">Tighter spacing, smaller cards</div></div>
+          <div class="toggle" id="toggle-compact" onclick="toggleOpt('compact')"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Rounded Badges</div><div class="setting-sub">Pill-shaped customer labels</div></div>
+          <div class="toggle on" id="toggle-badges" onclick="toggleOpt('badges')"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Animated Bars</div><div class="setting-sub">Smooth chart animations</div></div>
+          <div class="toggle on" id="toggle-anim" onclick="toggleOpt('anim')"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Show % on Bars</div><div class="setting-sub">Percentage split per customer</div></div>
+          <div class="toggle on" id="toggle-pct" onclick="toggleOpt('pct')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYNC -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Google Sheets Sync</h4>
+        <input id="settings-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;margin-bottom:10px;">
+        <div style="display:flex;gap:8px">
+          <button class="btn-modal-add" onclick="saveSettingsUrl()">Save URL</button>
+          <button class="btn-modal-close" onclick="manualSync()">Sync Now</button>
+        </div>
+        <div style="margin-top:10px">
+          <div class="show-code-link" style="text-align:left" onclick="document.getElementById('code-modal').classList.add('open')">📋 Show Apps Script code</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Data Management</h4>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:10px" id="data-summary"></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-export" onclick="exportCSV()">↓ Export CSV</button>
+          <label style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;">
+            ↑ Import CSV<input type="file" id="csv-import" accept=".csv" onchange="importCSV(event)" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICON / PWA -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>🏠 App Icon &amp; Home Screen Install</h4>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Design your icon, download it, then follow the install steps to pin the app to your phone or desktop.</p>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Icon Style</div>
+          <div id="icon-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Background Color</div>
+          <div class="color-row" id="icon-bg-chips"></div>
+          <div class="custom-color">
+            <input type="color" id="icon-bg-custom" oninput="setIconBg(this.value)">
+            <label>Custom background</label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px">
+          <div style="text-align:center">
+            <canvas id="icon-canvas" width="120" height="120" style="border-radius:26px;display:block;box-shadow:0 4px 24px rgba(0,0,0,0.5)"></canvas>
+            <div style="font-size:0.62rem;color:var(--muted);margin-top:6px">Large Preview</div>
+          </div>
+          <div style="text-align:center">
+            <canvas id="phone-icon" width="64" height="64" style="border-radius:15px;display:block;box-shadow:0 2px 10px rgba(0,0,0,0.5)"></canvas>
+            <div style="font-size:0.65rem;color:var(--text);font-weight:600;margin-top:5px" id="phone-label">TimeSheet</div>
+            <div style="font-size:0.58rem;color:var(--muted);margin-top:1px">Phone size</div>
+          </div>
+        </div>
+
+        <button class="btn-modal-add" onclick="downloadIcon()" style="width:100%;margin-bottom:12px">⬇ Download Icon PNG</button>
+
+        <div style="background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:12px;margin-bottom:8px">
+          <div style="font-size:0.7rem;font-weight:700;margin-bottom:8px;color:var(--accent)">📱 Android — Add to Home Screen</div>
+          <div style="font-size:0.72rem;color:var(--muted);line-height:1.9">
+            1. Open your Netlify URL in <b style="color:var(--text)">Chrome</b><br>
+            2. Tap <b style="color:var(--text)">⋮ menu → "Add to Home screen"</b><br>
+            3. Tap <b style="color:var(--text)">Add</b> — opens fullscreen like an app ✓<br>
+            <span style="color:var(--accent2)">To use custom icon:</span> Long-press shortcut → Edit → tap icon → Gallery → select downloaded PNG
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:12px;margin-bottom:8px">
+          <div style="font-size:0.7rem;font-weight:700;margin-bottom:8px;color:var(--accent2)">🖥 Windows Edge — Install as App</div>
+          <div style="font-size:0.72rem;color:var(--muted);line-height:1.9">
+            1. Open Netlify URL in <b style="color:var(--text)">Microsoft Edge</b><br>
+            2. Click <b style="color:var(--text)">⋯ menu → Apps → Install this site as an app</b><br>
+            3. Or click the <b style="color:var(--text)">install icon</b> in the address bar (screen + arrow)<br>
+            4. Opens in its own window, no browser bar ✓
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- CUSTOMER MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target.id==='modal-bg')closeModal()">
+  <div class="modal">
+    <h3>Manage Customers</h3>
+    <input id="new-cust-input" type="text" placeholder="New customer name..." onkeydown="if(event.key==='Enter')addCustomer()">
+    <div class="modal-btns">
+      <button class="btn-modal-add" onclick="addCustomer()">Add</button>
+      <button class="btn-modal-close" onclick="closeModal()">Done</button>
+    </div>
+    <div id="cust-list" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="edit-modal" onclick="if(event.target.id==='edit-modal')closeEdit()">
+  <div class="modal">
+    <h3>Edit Entry</h3>
+    <input type="hidden" id="edit-id">
+    <select id="edit-customer"></select>
+    <input id="edit-hours" type="number" min="0.25" max="24" step="0.25" placeholder="Hours">
+    <input id="edit-date" type="date">
+    <input id="edit-note" type="text" placeholder="Note">
+    <div class="modal-btns">
+      <button class="btn-modal-add" onclick="saveEdit()">Save</button>
+      <button class="btn-modal-close" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CODE MODAL -->
+<div class="modal-bg" id="code-modal" onclick="if(event.target.id==='code-modal')document.getElementById('code-modal').classList.remove('open')">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <h3>📋 Apps Script Code</h3>
+    <p style="font-size:0.74rem;color:var(--muted);margin-bottom:10px">Copy → paste into script.google.com → Save → Deploy as Web App</p>
+    <textarea class="code-area" id="code-area" readonly></textarea>
+    <div class="modal-btns">
+      <button class="btn-modal-add" onclick="copyCode()">Copy Code</button>
+      <button class="btn-modal-close" onclick="document.getElementById('code-modal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// APPS SCRIPT CODE
+// ═══════════════════════════════════════
+const SCRIPT_CODE = `// TimeSheet Pro - Google Apps Script
+// Extensions > Apps Script > paste > Save > Deploy > Web App
+// Execute as: Me | Access: Anyone | copy /exec URL
+
+const ENTRY_SHEET = 'Entries';
+const CUST_SHEET  = 'Customers';
+
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (e.parameter.action === 'getAll') {
+    const eSheet = getOrCreate(ss, ENTRY_SHEET);
+    const cSheet = getOrCreate(ss, CUST_SHEET);
+    const eData  = eSheet.getLastRow() > 1 ? eSheet.getRange(2,1,eSheet.getLastRow()-1,5).getValues() : [];
+    const cData  = cSheet.getLastRow() > 0 ? cSheet.getRange(1,1,cSheet.getLastRow(),1).getValues().flat() : [];
+    return out({ entries: eData, customers: cData.filter(Boolean) });
+  }
+  return out({ error: 'unknown action' });
+}
+
+function doPost(e) {
+  const d  = JSON.parse(e.postData.contents);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (d.action === 'addEntry') {
+    const sh = getOrCreate(ss, ENTRY_SHEET);
+    if (sh.getLastRow() === 0) sh.appendRow(['id','date','customer','hours','note']);
+    sh.appendRow([d.id, d.date, d.customer, d.hours, d.note||'']);
+    return out({ ok: true });
+  }
+  if (d.action === 'deleteEntry') {
+    const sh = getOrCreate(ss, ENTRY_SHEET);
+    const rows = sh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(d.id)) { sh.deleteRow(i+1); break; }
+    }
+    return out({ ok: true });
+  }
+  if (d.action === 'updateEntry') {
+    const sh = getOrCreate(ss, ENTRY_SHEET);
+    const rows = sh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(d.id)) {
+        sh.getRange(i+1,2,1,4).setValues([[d.date,d.customer,d.hours,d.note||'']]);
+        break;
+      }
+    }
+    return out({ ok: true });
+  }
+  if (d.action === 'saveCustomers') {
+    const sh = getOrCreate(ss, CUST_SHEET);
+    sh.clearContents();
+    d.customers.forEach(c => sh.appendRow([c]));
+    return out({ ok: true });
+  }
+  return out({ error: 'unknown action' });
+}
+
+function getOrCreate(ss, name) {
+  return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+function out(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+document.getElementById('code-area').value = SCRIPT_CODE;
+
+// ═══════════════════════════════════════
+// STATE & SEED DATA
+// ═══════════════════════════════════════
+const SK='tspro_entries', CK='tspro_customers', UK='tspro_url';
+
+const SEED = [
+  {id:1748822400001,date:'2026-06-03',customer:'EGNOS V2',hours:2,note:'LER and LER , ALSO THE BT OPENSERVE LINE CHANGES'},
+  {id:1748822400002,date:'2026-06-03',customer:'Eutelsat Oneweb',hours:2.5,note:'SAP 06 , SAP 16 AND SAP 09'},
+  {id:1748736000001,date:'2026-06-02',customer:'MAXAR(AVENTOR)',hours:1,note:'Remove faulty and old equipment -Jeff Adams'},
+  {id:1748736000002,date:'2026-06-02',customer:'EGNOS V2',hours:1,note:'New line migration , setup TEAMS meeting ,internal discussion with Xolisa'},
+  {id:1748736000003,date:'2026-06-02',customer:'Eutelsat Oneweb',hours:3,note:'SAP 06 MOTOR REPLACE, TESTING , INVENTORY , RCU ON SAP 16 , MAINTENANCE COLLAGES'},
+  {id:1748736000004,date:'2026-06-02',customer:'KSAT',hours:5,note:'KSAT VISIT & AVANTOR, HA5 feed control board replacement, SSPA communication'},
+  {id:1748736000005,date:'2026-06-02',customer:'12M Antenna',hours:2,note:'FOLLOW UP ON CSS BOARDS WITH SAFRAN, search new contacts, FEED ASSEMBLY'},
+  {id:1748736000006,date:'2026-06-02',customer:'EGNOS V2',hours:1,note:'NEW LINE TEAMS meeting and routing internal discussion and prep. Old line was terminated'},
+  {id:1748649600001,date:'2026-06-01',customer:'Eutelsat Oneweb',hours:2,note:'SAP 06 Tilt TS and reporting'},
+  {id:1748649600002,date:'2026-06-01',customer:'KSAT',hours:6,note:'KSAT and AVANTOR (JEFF ADAMS) VISIT. FIREWALL INSTALLATION , HA1 MAINT , HA5 TROUBLESHOOT'},
+  {id:1748304000001,date:'2026-05-27',customer:'12M Antenna',hours:2.5,note:'CCS Board , CMC proposal review and discussions'},
+  {id:1747958400001,date:'2026-05-22',customer:'CNES',hours:2,note:'MNT'},
+  {id:1748476800001,date:'2026-05-29',customer:'Eutelsat Oneweb',hours:1.5,note:'SAP 09 , SAP 16 tilt arm TS, SAP 17 rework'},
+  {id:1748476800002,date:'2026-05-29',customer:'CNES',hours:2.9,note:'Maintenance, PSU server replacement , JIRA updates, archive updates'},
+  {id:1748476800003,date:'2026-05-29',customer:'12M Antenna',hours:1,note:'FEED prep, cleaning seals'},
+  {id:1748390400001,date:'2026-05-28',customer:'12M Antenna',hours:2,note:'ZODIAC CSS REPAIRS vs PURCHASE , CMC PROPOSAL'},
+  {id:1748390400002,date:'2026-05-28',customer:'Eutelsat Oneweb',hours:4.5,note:'SAP 9 , MEETING, SAP 16 , afterhours discussions , time register , RCA'},
+  {id:1748390400003,date:'2026-05-28',customer:'KSAT',hours:1,note:'KSAT UPS scheduling , mask obtrusions, logistics'},
+  {id:1748390400004,date:'2026-05-28',customer:'CNES',hours:2,note:'ADU BUS issue troubleshooting with Adrien'},
+  {id:1748131200001,date:'2026-05-25',customer:'EGNOS V2',hours:6.5,note:'Indoor/outdoor Inspection , reports, Incoming Inspection reports, Inventory updates'},
+  {id:1747699200001,date:'2026-05-20',customer:'CNES',hours:3,note:''},
+  {id:1747958400002,date:'2026-05-22',customer:'Eutelsat Oneweb',hours:8,note:'RCA STS - WHOLE DAY PLUS AFTERHOURS DISCUSSIONS'},
+  {id:1747872000001,date:'2026-05-21',customer:'12M Antenna',hours:1,note:'Troubleshooting communication - ongoing'},
+  {id:1747872000002,date:'2026-05-21',customer:'CNES',hours:2.5,note:'Maintenance -JIRA report'},
+  {id:1747872000003,date:'2026-05-21',customer:'12M Antenna',hours:2,note:''}
+];
+
+// Load from localStorage, seed if empty
+let stored = localStorage.getItem(SK);
+let entries;
+if (!stored || JSON.parse(stored).length === 0) {
+  entries = SEED;
+  localStorage.setItem(SK, JSON.stringify(entries));
+} else {
+  entries = JSON.parse(stored);
+}
+
+let customers = JSON.parse(localStorage.getItem(CK) || '[]');
+if (!customers.length) {
+  customers = ['KSAT','Eutelsat Oneweb','EGNOS V2','CNES','12M Antenna','MAXAR(AVENTOR)'];
+  localStorage.setItem(CK, JSON.stringify(customers));
+}
+let scriptUrl = localStorage.getItem(UK) || '';
+
+const COLORS = ['#f0c040','#4af0b0','#f06080','#a0a8ff','#ff9f50','#80e0ff','#ff80c0','#c0ff80'];
+const MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{ t.classList.toggle('active', ['dashboard','charts','log','report','settings'][i]===name); });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='charts') renderCharts();
+  if(name==='report') renderReport();
+  if(name==='settings') {
+    document.getElementById('settings-url').value = scriptUrl||'';
+    document.getElementById('data-summary').textContent = `${entries.length} entries across ${customers.length} customers`;
+    buildAppearanceUI();
+  }
+}
+
+// ═══════════════════════════════════════
+// SETUP / SYNC
+// ═══════════════════════════════════════
+function init() {
+  applyAppearance();
+  if (scriptUrl) document.getElementById('setup-screen').style.display='none';
+  const now=new Date();
+  document.getElementById('inp-date').value=toDS(now);
+  document.getElementById('week-label').textContent='Week '+wk(now);
+  document.getElementById('month-label').textContent=now.toLocaleString('default',{month:'long',year:'numeric'});
+  populateSelects(); renderAll(); badge('idle');
+  if(scriptUrl) syncDown();
+}
+
+function completeSetup() {
+  const url=document.getElementById('setup-url').value.trim();
+  if(!url.includes('script.google.com')){ alert('Please paste a valid Apps Script /exec URL'); return; }
+  scriptUrl=url; localStorage.setItem(UK,url);
+  document.getElementById('setup-screen').style.display='none';
+  toast('Connected! Syncing…'); syncDown();
+}
+function skipSetup(){ document.getElementById('setup-screen').style.display='none'; toast('Offline mode'); }
+function saveSettingsUrl(){
+  const url=document.getElementById('settings-url').value.trim();
+  if(!url){ return toast('Enter a URL first'); }
+  scriptUrl=url; localStorage.setItem(UK,url); toast('URL saved'); syncDown();
+}
+function manualSync(){ if(!scriptUrl){ document.getElementById('setup-screen').style.display='flex'; return; } syncDown(); }
+
+async function syncDown() {
+  badge('syncing');
+  try {
+    const r=await fetch(scriptUrl+'?action=getAll&t='+Date.now());
+    const d=await r.json();
+    if(d.entries&&d.entries.length){
+      entries=d.entries.map(r=>({id:r[0],date:r[1],customer:r[2],hours:parseFloat(r[3]),note:r[4]||''}));
+      entries.sort((a,b)=>b.date.localeCompare(a.date));
+      localStorage.setItem(SK,JSON.stringify(entries));
+    }
+    if(d.customers&&d.customers.length){
+      customers=[...new Set([...d.customers])];
+      localStorage.setItem(CK,JSON.stringify(customers));
+    }
+    populateSelects(); renderAll(); badge('ok');
+  } catch(e){ badge('err'); }
+}
+
+async function push(body){ if(!scriptUrl)return; try{ await fetch(scriptUrl,{method:'POST',body:JSON.stringify(body)}); }catch(e){} }
+
+function badge(s){
+  const dot=document.getElementById('sync-dot'),txt=document.getElementById('sync-text');
+  dot.className='sync-dot';
+  if(s==='ok'){dot.classList.add('ok');txt.textContent='synced';}
+  else if(s==='err'){dot.classList.add('err');txt.textContent='sync failed';}
+  else if(s==='syncing'){dot.classList.add('spin');txt.textContent='syncing…';}
+  else{txt.textContent=scriptUrl?'tap to sync':'offline';}
+}
+
+// ═══════════════════════════════════════
+// CORE
+// ═══════════════════════════════════════
+function save(pushCusts=false){
+  localStorage.setItem(SK,JSON.stringify(entries));
+  localStorage.setItem(CK,JSON.stringify(customers));
+  if(pushCusts) push({action:'saveCustomers',customers});
+}
+function toDS(d){ return d.toISOString().split('T')[0]; }
+function wk(d){ return Math.ceil((((d-new Date(d.getFullYear(),0,1))/86400000)+new Date(d.getFullYear(),0,1).getDay()+1)/7); }
+function monStart(d){ const dt=new Date(d),day=dt.getDay(); dt.setDate(dt.getDate()-day+(day===0?-6:1)); return toDS(dt); }
+function fmtH(h){ if(!h)return '0h'; const w=Math.floor(h),m=Math.round((h-w)*60); return m?`${w}h${m}m`:`${w}h`; }
+
+function populateSelects(){
+  ['inp-customer','filter-customer','edit-customer'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    const cur=sel.value;
+    while(sel.options.length>1)sel.remove(1);
+    customers.forEach(c=>sel.add(new Option(c,c)));
+    if(cur)sel.value=cur;
+  });
+}
+
+function renderAll(){ renderStats(); renderBars(); renderRecent(); renderTable(); }
+
+// ═══════════════════════════════════════
+// ADD ENTRY
+// ═══════════════════════════════════════
+async function addEntry(){
+  const cust=document.getElementById('inp-customer').value,hrs=parseFloat(document.getElementById('inp-hours').value),date=document.getElementById('inp-date').value,note=document.getElementById('inp-note').value.trim();
+  if(!cust)return toast('Select a customer');
+  if(!hrs||hrs<=0)return toast('Enter valid hours');
+  if(!date)return toast('Pick a date');
+  const e={id:Date.now(),date,customer:cust,hours:hrs,note};
+  entries.unshift(e); save();
+  document.getElementById('inp-hours').value=''; document.getElementById('inp-note').value='';
+  renderAll(); toast(`✓ ${hrs}h logged for ${cust}`);
+  badge('syncing'); await push({action:'addEntry',...e}); badge('ok');
+}
+
+// ═══════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════
+function renderStats(){
+  const now=new Date(),today=toDS(now),m=monStart(now),mo=today.slice(0,7),yr=today.slice(0,4);
+  let t=0,w=0,mo2=0,y=0;
+  entries.forEach(e=>{
+    if(e.date===today)t+=e.hours;
+    if(e.date>=m)w+=e.hours;
+    if(e.date.startsWith(mo))mo2+=e.hours;
+    if(e.date.startsWith(yr))y+=e.hours;
+  });
+  document.getElementById('stat-today').textContent=fmtH(t);
+  document.getElementById('stat-week').textContent=fmtH(w);
+  document.getElementById('stat-month').textContent=fmtH(mo2);
+  document.getElementById('stat-year').textContent=fmtH(y);
+}
+
+// ═══════════════════════════════════════
+// CUSTOMER BARS (dashboard)
+// ═══════════════════════════════════════
+function renderBars(){
+  const mo=new Date().toISOString().slice(0,7),tot={};
+  entries.filter(e=>e.date.startsWith(mo)).forEach(e=>{tot[e.customer]=(tot[e.customer]||0)+e.hours;});
+  const sorted=Object.entries(tot).sort((a,b)=>b[1]-a[1]),max=sorted[0]?.[1]||1,total=sorted.reduce((s,x)=>s+x[1],0);
+  const wrap=document.getElementById('customer-bars'); wrap.innerHTML='';
+  if(!sorted.length){wrap.innerHTML='<div class="empty">No entries this month.</div>';return;}
+  sorted.forEach(([name,hrs],i)=>{
+    const pct=(hrs/max*100).toFixed(1),col=COLORS[i%COLORS.length],share=((hrs/total)*100).toFixed(0);
+    wrap.innerHTML+=`<div class="cust-row">
+      <div class="cust-name" title="${name}">${name}</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="cust-hours">${fmtH(hrs)}</div>
+      <div class="cust-pct">${share}%</div>
+    </div>`;
+  });
+}
+
+// ═══════════════════════════════════════
+// RECENT TABLE (dashboard)
+// ═══════════════════════════════════════
+function renderRecent(){
+  const recent=entries.slice(0,8);
+  const tb=document.getElementById('recent-body'),em=document.getElementById('recent-empty');
+  tb.innerHTML='';
+  if(!recent.length){em.style.display='block';return;} em.style.display='none';
+  recent.forEach(e=>{
+    const col=COLORS[customers.indexOf(e.customer)%COLORS.length]||'#888';
+    const d=new Date(e.date+'T00:00:00'),ds=d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'});
+    tb.innerHTML+=`<tr>
+      <td>${ds}</td>
+      <td><span class="badge" style="background:${col}22;color:${col}">${e.customer}</span></td>
+      <td style="color:var(--accent);font-weight:700">${fmtH(e.hours)}</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.note||'—'}</td>
+      <td class="td-act" onclick="openEdit(${e.id})" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" onclick="delEntry(${e.id})" title="Delete">✕</td>
+    </tr>`;
+  });
+}
+
+// ═══════════════════════════════════════
+// FULL LOG TABLE
+// ═══════════════════════════════════════
+function renderTable(){
+  const cf=document.getElementById('filter-customer').value,pf=document.getElementById('filter-period').value;
+  const now=new Date(),m=monStart(now),mo=toDS(now).slice(0,7),yr=toDS(now).slice(0,4);
+  const fil=entries.filter(e=>{
+    if(cf&&e.customer!==cf)return false;
+    if(pf==='week'&&e.date<m)return false;
+    if(pf==='month'&&!e.date.startsWith(mo))return false;
+    if(pf==='year'&&!e.date.startsWith(yr))return false;
+    return true;
+  });
+  const tb=document.getElementById('log-body'),em=document.getElementById('empty-msg');
+  tb.innerHTML='';
+  if(!fil.length){em.style.display='block';return;} em.style.display='none';
+  fil.forEach(e=>{
+    const col=COLORS[customers.indexOf(e.customer)%COLORS.length]||'#888';
+    const d=new Date(e.date+'T00:00:00'),ds=d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'});
+    tb.innerHTML+=`<tr>
+      <td>${ds}</td>
+      <td><span class="badge" style="background:${col}22;color:${col}">${e.customer}</span></td>
+      <td style="color:var(--accent);font-weight:700">${fmtH(e.hours)}</td>
+      <td style="color:var(--muted)">${e.note||'—'}</td>
+      <td class="td-act" onclick="openEdit(${e.id})" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" onclick="delEntry(${e.id})" title="Delete">✕</td>
+    </tr>`;
+  });
+}
+
+// ═══════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════
+function renderCharts(){
+  const period=document.getElementById('chart-period').value;
+  const now=new Date(),mo=toDS(now).slice(0,7),yr=toDS(now).slice(0,4);
+  const fil=entries.filter(e=>{
+    if(period==='month')return e.date.startsWith(mo);
+    if(period==='year')return e.date.startsWith(yr);
+    return true;
+  });
+  const lbl={'month':'This Month','year':'2026','all':'All Time'}[period];
+  document.getElementById('charts-period-label').textContent=lbl;
+
+  // Totals per customer
+  const tot={};
+  fil.forEach(e=>{tot[e.customer]=(tot[e.customer]||0)+e.hours;});
+  const sorted=Object.entries(tot).sort((a,b)=>b[1]-a[1]);
+  const total=sorted.reduce((s,x)=>s+x[1],0)||1;
+
+  renderDonut(sorted,total);
+  renderTrend();
+  renderChartBars(sorted,total);
+}
+
+function renderDonut(sorted,total){
+  const size=160,cx=80,cy=80,r=60,stroke=22;
+  const circ=2*Math.PI*r;
+  let offset=0;
+  let paths='',legend='';
+  sorted.forEach(([name,hrs],i)=>{
+    const frac=hrs/total,dash=frac*circ,gap=circ-dash,col=COLORS[i%COLORS.length];
+    paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset+=dash;
+    legend+=`<div class="legend-item"><div class="legend-dot" style="background:${col}"></div><div class="legend-name">${name}</div><div class="legend-val">${fmtH(hrs)} · ${((hrs/total)*100).toFixed(0)}%</div></div>`;
+  });
+  const svg=`<svg class="donut-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="${stroke}"/>
+    ${paths}
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" fill="var(--text)" font-family="Syne" font-weight="800" font-size="18">${fmtH(total)}</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" fill="var(--muted)" font-family="DM Mono" font-size="9">TOTAL</text>
+  </svg>`;
+  document.getElementById('donut-wrap').innerHTML=svg+`<div class="donut-legend">${legend}</div>`;
+}
+
+function renderTrend(){
+  const yr=new Date().getFullYear().toString();
+  const monthly=Array(12).fill(0);
+  entries.filter(e=>e.date.startsWith(yr)).forEach(e=>{ const m=parseInt(e.date.slice(5,7))-1; monthly[m]+=e.hours; });
+  const max=Math.max(...monthly,1);
+  const wrap=document.getElementById('trend-bars'); wrap.innerHTML='';
+  monthly.forEach((h,i)=>{
+    const hpx=Math.max((h/max)*100,h>0?4:0);
+    const col=COLORS[i%COLORS.length];
+    wrap.innerHTML+=`<div class="bar-col">
+      <div class="bar-col-val">${h>0?fmtH(h):''}</div>
+      <div class="bar-col-fill" style="height:${hpx}px;background:${h>0?col:'var(--border)'}"></div>
+      <div class="bar-col-lbl">${MONTHS[i]}</div>
+    </div>`;
+  });
+}
+
+function renderChartBars(sorted,total){
+  const max=sorted[0]?.[1]||1;
+  const wrap=document.getElementById('chart-bars'); wrap.innerHTML='';
+  if(!sorted.length){wrap.innerHTML='<div class="empty">No data for this period.</div>';return;}
+  sorted.forEach(([name,hrs],i)=>{
+    const pct=(hrs/max*100).toFixed(1),col=COLORS[i%COLORS.length],share=((hrs/total)*100).toFixed(0);
+    wrap.innerHTML+=`<div class="cust-row">
+      <div class="cust-name" title="${name}">${name}</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="cust-hours">${fmtH(hrs)}</div>
+      <div class="cust-pct">${share}%</div>
+    </div>`;
+  });
+}
+
+// ═══════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════
+function renderReport(){
+  const yr=document.getElementById('report-year').value;
+  const mo=document.getElementById('report-month').value;
+  const prefix=mo==='all'?yr:`${yr}-${mo}`;
+  const filtered=entries.filter(e=>e.date.startsWith(prefix));
+
+  const tot={};
+  filtered.forEach(e=>{tot[e.customer]=(tot[e.customer]||0)+e.hours;});
+  const sorted=Object.entries(tot).sort((a,b)=>b[1]-a[1]);
+  const grand=sorted.reduce((s,x)=>s+x[1],0);
+
+  const mName=mo==='all'?'Full Year':new Date(`${yr}-${mo}-01`).toLocaleString('default',{month:'long'});
+  const title=mo==='all'?`Annual Report — ${yr}`:`Report — ${mName} ${yr}`;
+
+  // Monthly breakdown if full year
+  let monthlyHTML='';
+  if(mo==='all'){
+    monthlyHTML='<div class="report-card" style="margin-top:12px"><h3>Monthly Breakdown</h3><table class="report-table"><thead><tr><th>Month</th>';
+    sorted.forEach(([n])=>monthlyHTML+=`<th>${n}</th>`);
+    monthlyHTML+='<th>Total</th></tr></thead><tbody>';
+    MONTHS.forEach((mn,mi)=>{
+      const mprefix=`${yr}-${String(mi+1).padStart(2,'0')}`;
+      const mEntries=entries.filter(e=>e.date.startsWith(mprefix));
+      if(!mEntries.length)return;
+      const mTot={};
+      mEntries.forEach(e=>{mTot[e.customer]=(mTot[e.customer]||0)+e.hours;});
+      const mGrand=Object.values(mTot).reduce((s,x)=>s+x,0);
+      monthlyHTML+=`<tr><td>${mn}</td>`;
+      sorted.forEach(([n])=>monthlyHTML+=`<td>${fmtH(mTot[n]||0)}</td>`);
+      monthlyHTML+=`<td style="color:var(--accent);font-weight:700">${fmtH(mGrand)}</td></tr>`;
+    });
+    monthlyHTML+='</tbody></table></div>';
+  }
+
+  document.getElementById('report-content').innerHTML=`
+    <div class="report-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:1rem;font-weight:800">${title}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:2px">Generated ${new Date().toLocaleDateString('en-ZA')}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="report-total">${fmtH(grand)}</div>
+          <div class="report-sub">Total Hours</div>
+        </div>
+      </div>
+      <table class="report-table">
+        <thead><tr><th>Customer / System</th><th>Hours</th><th>% Share</th><th>Entries</th></tr></thead>
+        <tbody>
+          ${sorted.map(([name,hrs])=>{
+            const cnt=filtered.filter(e=>e.customer===name).length;
+            const col=COLORS[customers.indexOf(name)%COLORS.length]||'#888';
+            return `<tr>
+              <td><span class="badge" style="background:${col}22;color:${col}">${name}</span></td>
+              <td style="font-weight:700">${fmtH(hrs)}</td>
+              <td>${((hrs/grand)*100).toFixed(1)}%</td>
+              <td>${cnt}</td>
+            </tr>`;
+          }).join('')}
+          <tr><td>TOTAL</td><td>${fmtH(grand)}</td><td>100%</td><td>${filtered.length}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    ${monthlyHTML}
+    <div class="report-card" style="margin-top:12px">
+      <h3>Detailed Log — ${mName} ${yr}</h3>
+      <table class="report-table">
+        <thead><tr><th>Date</th><th>Customer</th><th>Hours</th><th>Note</th></tr></thead>
+        <tbody>
+          ${filtered.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>{
+            const d=new Date(e.date+'T00:00:00'),ds=d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'});
+            return `<tr><td>${ds}</td><td>${e.customer}</td><td>${fmtH(e.hours)}</td><td>${e.note||'—'}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// DELETE & EDIT
+// ═══════════════════════════════════════
+async function delEntry(id){
+  if(!confirm('Delete this entry?'))return;
+  entries=entries.filter(e=>e.id!==id); save();
+  renderAll(); toast('Entry removed');
+  await push({action:'deleteEntry',id});
+}
+
+function openEdit(id){
+  const e=entries.find(x=>x.id===id); if(!e)return;
+  document.getElementById('edit-id').value=id;
+  populateSelects();
+  document.getElementById('edit-customer').value=e.customer;
+  document.getElementById('edit-hours').value=e.hours;
+  document.getElementById('edit-date').value=e.date;
+  document.getElementById('edit-note').value=e.note||'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEdit(){ document.getElementById('edit-modal').classList.remove('open'); }
+async function saveEdit(){
+  const id=parseInt(document.getElementById('edit-id').value);
+  const e=entries.find(x=>x.id===id); if(!e)return;
+  e.customer=document.getElementById('edit-customer').value;
+  e.hours=parseFloat(document.getElementById('edit-hours').value);
+  e.date=document.getElementById('edit-date').value;
+  e.note=document.getElementById('edit-note').value.trim();
+  save(); closeEdit(); renderAll(); toast('Entry updated');
+  await push({action:'updateEntry',...e});
+}
+
+// ═══════════════════════════════════════
+// CSV
+// ═══════════════════════════════════════
+function exportCSV(){
+  const rows=[['Date','Customer','Hours','Note']];
+  entries.forEach(e=>rows.push([e.date,e.customer,e.hours,e.note||'']));
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n'));
+  a.download='timesheet_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  toast('CSV exported!');
+}
+
+function importCSV(event){
+  const file=event.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const lines=e.target.result.split('\n').slice(1).filter(Boolean);
+    let count=0;
+    lines.forEach(line=>{
+      const cols=line.split(',').map(c=>c.replace(/^"|"$/g,'').trim());
+      if(cols.length<3)return;
+      const [date,customer,hours,note]=cols;
+      if(!date||!customer||!hours)return;
+      const id=Date.now()+Math.random();
+      if(!entries.find(x=>x.date===date&&x.customer===customer&&parseFloat(x.hours)===parseFloat(hours))){
+        entries.push({id,date,customer,hours:parseFloat(hours),note:note||''});
+        count++;
+        if(!customers.includes(customer))customers.push(customer);
+      }
+    });
+    entries.sort((a,b)=>b.date.localeCompare(a.date));
+    save(true); populateSelects(); renderAll();
+    toast(`Imported ${count} new entries`);
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════
+// CUSTOMER MODAL
+// ═══════════════════════════════════════
+function openModal(){ document.getElementById('modal-bg').classList.add('open'); renderCustList(); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+async function addCustomer(){
+  const inp=document.getElementById('new-cust-input'),val=inp.value.trim();
+  if(!val||customers.includes(val))return;
+  customers.push(val); inp.value=''; save(true); populateSelects(); renderCustList(); toast(`"${val}" added`);
+}
+function removeCustomer(n){ customers=customers.filter(c=>c!==n); save(true); populateSelects(); renderCustList(); }
+function renderCustList(){
+  document.getElementById('cust-list').innerHTML=customers.map(c=>`<div class="cust-list-item"><span>${c}</span><button onclick="removeCustomer('${c.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(SCRIPT_CODE).then(()=>toast('Code copied!')).catch(()=>{ document.getElementById('code-area').select(); document.execCommand('copy'); toast('Copied!'); });
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
+
+// ═══════════════════════════════════════
+// MIC
+// ═══════════════════════════════════════
+let recognition=null,micActive=false;
+function initMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ const b=document.getElementById('btn-mic'); b.style.opacity='0.35'; b.style.cursor='not-allowed'; b.title='Not supported — try Chrome/Edge'; return; }
+  recognition=new SR();
+  recognition.lang='en-ZA'; recognition.continuous=false; recognition.interimResults=true;
+  recognition.onstart=()=>{ micActive=true; const b=document.getElementById('btn-mic'); b.classList.add('listening'); b.textContent='⏹'; document.getElementById('inp-note').placeholder='🎙 Listening…'; };
+  recognition.onresult=e=>{ let t=''; for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript; document.getElementById('inp-note').value=t; };
+  recognition.onerror=e=>{ if(e.error==='not-allowed')toast('Mic permission denied'); else if(e.error!=='aborted')toast('Mic error: '+e.error); stopMic(); };
+  recognition.onend=()=>stopMic();
+}
+function stopMic(){ micActive=false; const b=document.getElementById('btn-mic'); b.classList.remove('listening'); b.classList.add('granted'); b.textContent='🎙️'; document.getElementById('inp-note').placeholder='Note (optional)'; if(recognition)try{recognition.stop();}catch(e){} }
+function toggleMic(){ if(!recognition)initMic(); if(!recognition)return; if(micActive)recognition.stop(); else try{recognition.start();}catch(e){toast('Could not start mic');} }
+
+// ═══════════════════════════════════════
+// ICON ENGINE
+// ═══════════════════════════════════════
+const ICON_KEY = 'tspro_icon';
+
+const ICON_STYLES = [
+  { id:'clock',   label:'Clock',    draw: drawIconClock   },
+  { id:'bolt',    label:'Bolt',     draw: drawIconBolt    },
+  { id:'chart',   label:'Chart',    draw: drawIconChart   },
+  { id:'ts',      label:'TS Text',  draw: drawIconTS      },
+  { id:'grid',    label:'Grid',     draw: drawIconGrid    },
+  { id:'diamond', label:'Diamond',  draw: drawIconDiamond },
+  { id:'target',  label:'Target',   draw: drawIconTarget  },
+  { id:'initials',label:'CO',       draw: drawIconInitials},
+];
+
+const ICON_BG_PRESETS = ['#0d0f14','#1a1040','#0a1628','#13100d','#0a120a','#1a0a0a','#f4f6fa','#1c1c1c'];
+
+let iconState = JSON.parse(localStorage.getItem(ICON_KEY) || 'null') || { styleId:'clock', bg:'#0d0f14' };
+
+function drawIconClock(ctx, s, accent){
+  const cx=s/2,cy=s/2,r=s*0.32;
+  ctx.strokeStyle=accent; ctx.lineWidth=s*0.055; ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  // hour hand
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*0.5*Math.sin(-1),cy-r*0.5*Math.cos(-1)); ctx.stroke();
+  // minute hand
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*0.75*Math.sin(1.2),cy-r*0.75*Math.cos(1.2)); ctx.stroke();
+  // center dot
+  ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(cx,cy,s*0.04,0,Math.PI*2); ctx.fill();
+}
+
+function drawIconBolt(ctx, s, accent){
+  ctx.fillStyle=accent;
+  ctx.beginPath();
+  ctx.moveTo(s*0.58,s*0.12); ctx.lineTo(s*0.28,s*0.54); ctx.lineTo(s*0.48,s*0.54);
+  ctx.lineTo(s*0.42,s*0.88); ctx.lineTo(s*0.72,s*0.46); ctx.lineTo(s*0.52,s*0.46);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawIconChart(ctx, s, accent){
+  const bars=[[0.2,0.6],[0.38,0.35],[0.56,0.75],[0.74,0.45]];
+  bars.forEach(([x,h],i)=>{
+    const alpha=0.5+i*0.17;
+    ctx.fillStyle=accent+(Math.round(alpha*255).toString(16).padStart(2,'0'));
+    ctx.beginPath();
+    ctx.roundRect(s*x,s*(1-h-0.1),s*0.15,s*h,s*0.03);
+    ctx.fill();
+  });
+  ctx.strokeStyle=accent+'88'; ctx.lineWidth=s*0.025;
+  ctx.beginPath(); ctx.moveTo(s*0.15,s*0.88); ctx.lineTo(s*0.85,s*0.88); ctx.stroke();
+}
+
+function drawIconTS(ctx, s, accent){
+  ctx.fillStyle=accent;
+  ctx.font=`800 ${s*0.38}px 'Syne',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('TS',s/2,s*0.42);
+  ctx.fillStyle=accent+'99';
+  ctx.font=`600 ${s*0.14}px 'DM Mono',monospace`;
+  ctx.fillText('PRO',s/2,s*0.72);
+}
+
+function drawIconGrid(ctx, s, accent){
+  const cells=[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
+  const alphas=[1,0.4,0.7,0.5,1,0.3,0.8,0.6,1];
+  cells.forEach(([cx,cy],i)=>{
+    ctx.fillStyle=accent+(Math.round(alphas[i]*255).toString(16).padStart(2,'0'));
+    const gx=s*0.18+cx*(s*0.22+s*0.04), gy=s*0.18+cy*(s*0.22+s*0.04);
+    ctx.beginPath(); ctx.roundRect(gx,gy,s*0.22,s*0.22,s*0.04); ctx.fill();
+  });
+}
+
+function drawIconDiamond(ctx, s, accent){
+  ctx.fillStyle=accent;
+  ctx.beginPath();
+  ctx.moveTo(s/2,s*0.12); ctx.lineTo(s*0.82,s/2); ctx.lineTo(s/2,s*0.88); ctx.lineTo(s*0.18,s/2);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(s/2,s*0.12); ctx.lineTo(s*0.82,s/2); ctx.lineTo(s/2,s/2);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawIconTarget(ctx, s, accent){
+  const rings=[0.38,0.26,0.14];
+  rings.forEach((r,i)=>{
+    ctx.strokeStyle=accent+(i===0?'66':i===1?'aa':'ff');
+    ctx.lineWidth=s*0.045;
+    ctx.beginPath(); ctx.arc(s/2,s/2,s*r,0,Math.PI*2); ctx.stroke();
+  });
+  ctx.fillStyle=accent;
+  ctx.beginPath(); ctx.arc(s/2,s/2,s*0.07,0,Math.PI*2); ctx.fill();
+}
+
+function drawIconInitials(ctx, s, accent){
+  ctx.fillStyle=accent;
+  ctx.font=`800 ${s*0.44}px 'Syne',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('CO',s/2,s*0.43);
+  ctx.fillStyle=accent+'88';
+  ctx.font=`600 ${s*0.12}px 'DM Mono',monospace`;
+  ctx.fillText('de Oliveira',s/2,s*0.73);
+}
+
+function renderIconCanvas(canvasId, size) {
+  const canvas = document.getElementById(canvasId); if(!canvas)return;
+  canvas.width=size; canvas.height=size;
+  const ctx=canvas.getContext('2d');
+  // Background
+  ctx.fillStyle=iconState.bg;
+  ctx.beginPath();
+  ctx.roundRect(0,0,size,size,size*0.22);
+  ctx.fill();
+  // Draw style
+  const style=ICON_STYLES.find(s=>s.id===iconState.styleId)||ICON_STYLES[0];
+  style.draw(ctx, size, appear.accent||'#f0c040');
+}
+
+function renderAllIcons(){ renderIconCanvas('icon-canvas',120); renderIconCanvas('phone-icon',64); }
+
+function buildIconUI(){
+  const grid=document.getElementById('icon-grid'); if(!grid)return;
+  grid.innerHTML=ICON_STYLES.map(s=>{
+    const c=document.createElement('canvas'); c.width=56; c.height=56;
+    c.style.cssText=`border-radius:13px;cursor:pointer;border:2px solid ${iconState.styleId===s.id?'var(--accent)':'var(--border)'};display:block;width:100%;aspect-ratio:1`;
+    setTimeout(()=>{ const ctx=c.getContext('2d'); ctx.fillStyle=iconState.bg; ctx.beginPath(); ctx.roundRect(0,0,56,56,12); ctx.fill(); s.draw(ctx,56,appear.accent||'#f0c040'); },10);
+    return `<div onclick="setIconStyle('${s.id}')" style="text-align:center">
+      <canvas id="icon-thumb-${s.id}" width="56" height="56" style="border-radius:13px;cursor:pointer;border:2px solid ${iconState.styleId===s.id?'var(--accent)':'var(--border)'};display:block;width:100%;aspect-ratio:1"></canvas>
+      <div style="font-size:0.6rem;color:var(--muted);margin-top:4px">${s.label}</div>
+    </div>`;
+  }).join('');
+
+  // Render all thumbs after DOM update
+  setTimeout(()=>{
+    ICON_STYLES.forEach(s=>{
+      const el=document.getElementById('icon-thumb-'+s.id); if(!el)return;
+      const ctx=el.getContext('2d');
+      el.width=56; el.height=56;
+      ctx.fillStyle=iconState.bg;
+      ctx.beginPath(); ctx.roundRect(0,0,56,56,12); ctx.fill();
+      s.draw(ctx,56,appear.accent||'#f0c040');
+    });
+  },50);
+
+  // BG chips
+  const chips=document.getElementById('icon-bg-chips'); if(!chips)return;
+  chips.innerHTML=ICON_BG_PRESETS.map(c=>`
+    <div class="color-chip ${iconState.bg===c?'active':''}" style="background:${c};border:2px solid var(--border)" onclick="setIconBg('${c}')"></div>
+  `).join('');
+  document.getElementById('icon-bg-custom').value=iconState.bg;
+
+  // Phone label
+  const lbl=document.getElementById('phone-label');
+  if(lbl) lbl.textContent=appear.appName||'TimeSheet';
+
+  renderAllIcons();
+}
+
+function setIconStyle(id){
+  iconState.styleId=id;
+  localStorage.setItem(ICON_KEY,JSON.stringify(iconState));
+  buildIconUI();
+}
+
+function setIconBg(c){
+  iconState.bg=c;
+  localStorage.setItem(ICON_KEY,JSON.stringify(iconState));
+  document.getElementById('icon-bg-custom').value=c;
+  document.querySelectorAll('#icon-bg-chips .color-chip').forEach((el,i)=>el.classList.toggle('active',ICON_BG_PRESETS[i]===c));
+  buildIconUI();
+}
+
+function downloadIcon(){
+  renderIconCanvas('icon-canvas',512);
+  const a=document.createElement('a');
+  a.download='timesheet-icon.png';
+  a.href=document.getElementById('icon-canvas').toDataURL('image/png');
+  a.click();
+  renderIconCanvas('icon-canvas',120);
+  toast('Icon downloaded! 512×512 PNG');
+}
+
+// ═══════════════════════════════════════
+// APPEARANCE ENGINE
+// ═══════════════════════════════════════
+const APPEAR_KEY = 'tspro_appear';
+
+const THEMES = [
+  { id:'dark',    name:'Dark',      bg:'#0d0f14', surface:'#161820', surface2:'#1e2028', border:'#2a2d38', text:'#e8eaf0', muted:'#6b7080' },
+  { id:'darker',  name:'Midnight',  bg:'#060608', surface:'#0e1016', surface2:'#161820', border:'#1e2230', text:'#e0e4f0', muted:'#5a6070' },
+  { id:'navy',    name:'Navy',      bg:'#050d1a', surface:'#0a1628', surface2:'#0f1e38', border:'#1a2e4a', text:'#d8e8ff', muted:'#5a7090' },
+  { id:'slate',   name:'Slate',     bg:'#0f1117', surface:'#171b26', surface2:'#1e2336', border:'#2a3048', text:'#dde2f0', muted:'#6070a0' },
+  { id:'light',   name:'Light',     bg:'#f4f6fa', surface:'#ffffff', surface2:'#eef0f6', border:'#dde0ec', text:'#1a1d2e', muted:'#8890a8' },
+  { id:'warm',    name:'Warm',      bg:'#13100d', surface:'#1e1812', surface2:'#261e18', border:'#342a22', text:'#f0e8d8', muted:'#7a6858' },
+  { id:'forest',  name:'Forest',    bg:'#0a120a', surface:'#121a12', surface2:'#182218', border:'#22301e', text:'#d8f0d0', muted:'#60806a' },
+  { id:'purple',  name:'Cosmic',    bg:'#0c0812', surface:'#141020', surface2:'#1c1830', border:'#2a2248', text:'#e8d8ff', muted:'#786898' },
+  { id:'carbon',  name:'Carbon',    bg:'#141414', surface:'#1c1c1c', surface2:'#242424', border:'#303030', text:'#e8e8e8', muted:'#707070' },
+];
+
+const ACCENT_PRESETS = [
+  '#f0c040','#4af0b0','#f06080','#a0a8ff','#ff9f50','#80e0ff',
+  '#ff80c0','#c0ff80','#ff6040','#40c8ff','#ffb030','#b0ff40',
+];
+
+const FONTS = [
+  { id:'syne',     name:'Syne',          family:"'Syne', sans-serif",         sample:'TimeSheet' },
+  { id:'inter',    name:'Inter',         family:"'Inter', sans-serif",         sample:'TimeSheet' },
+  { id:'space',    name:'Space Grotesk', family:"'Space Grotesk', sans-serif", sample:'TimeSheet' },
+  { id:'montserrat',name:'Montserrat',   family:"'Montserrat', sans-serif",    sample:'TimeSheet' },
+  { id:'rajdhani', name:'Rajdhani',      family:"'Rajdhani', sans-serif",      sample:'TimeSheet' },
+  { id:'orbitron', name:'Orbitron',      family:"'Orbitron', sans-serif",      sample:'TIMESHEET' },
+  { id:'nunito',   name:'Nunito',        family:"'Nunito', sans-serif",        sample:'TimeSheet' },
+  { id:'bebas',    name:'Bebas Neue',    family:"'Bebas Neue', sans-serif",    sample:'TIMESHEET' },
+];
+
+const OPTS_DEFAULTS = { compact:false, badges:true, anim:true, pct:true };
+
+let appear = JSON.parse(localStorage.getItem(APPEAR_KEY) || 'null') || {
+  themeId: 'dark',
+  accent: '#f0c040',
+  fontId: 'syne',
+  radius: 12,
+  fontSize: 14,
+  appName: 'TimeSheet',
+  opts: {...OPTS_DEFAULTS}
+};
+
+function applyAppearance() {
+  const t = THEMES.find(x=>x.id===appear.themeId) || THEMES[0];
+  const r = document.documentElement;
+  r.style.setProperty('--bg',        t.bg);
+  r.style.setProperty('--surface',   t.surface);
+  r.style.setProperty('--surface2',  t.surface2);
+  r.style.setProperty('--border',    t.border);
+  r.style.setProperty('--text',      t.text);
+  r.style.setProperty('--muted',     t.muted);
+  r.style.setProperty('--accent',    appear.accent);
+  r.style.setProperty('--radius',    appear.radius+'px');
+
+  const font = FONTS.find(x=>x.id===appear.fontId) || FONTS[0];
+  document.body.style.fontFamily = font.family;
+  document.body.style.fontSize   = appear.fontSize+'px';
+
+  // compact mode
+  document.body.classList.toggle('compact', appear.opts.compact);
+
+  // badge radius
+  document.querySelectorAll('.badge').forEach(b=>{
+    b.style.borderRadius = appear.opts.badges ? '20px' : '4px';
+  });
+
+  // update preview
+  const pv = document.getElementById('pv-title');
+  if(pv){ const n=appear.appName||'TimeSheet'; pv.innerHTML=n+'<span> Pro</span>'; }
+  const pvb = document.getElementById('pv-badge');
+  if(pvb){ pvb.style.background=appear.accent+'22'; pvb.style.color=appear.accent; }
+
+  // apply app name
+  const logo = document.querySelector('.logo');
+  if(logo){ const n=appear.appName||'TimeSheet'; logo.innerHTML=n+'<span> Pro</span>'; }
+  document.title = (appear.appName||'TimeSheet')+' Pro';
+
+  saveAppear();
+}
+
+function saveAppear(){ localStorage.setItem(APPEAR_KEY, JSON.stringify(appear)); }
+
+function buildAppearanceUI() {
+  // Theme grid
+  const tg = document.getElementById('theme-grid');
+  if(tg){ tg.innerHTML = THEMES.map(t=>`
+    <div class="theme-swatch ${appear.themeId===t.id?'active':''}" style="background:${t.bg}" onclick="setTheme('${t.id}')">
+      <div class="sw-dots">
+        <div class="sw-dot" style="background:${t.surface}"></div>
+        <div class="sw-dot" style="background:${t.text}"></div>
+        <div class="sw-dot" style="background:#f0c040"></div>
+      </div>
+      <div class="sw-name" style="color:${t.text}">${t.name}</div>
+    </div>`).join(''); }
+
+  // Accent chips
+  const ac = document.getElementById('accent-chips');
+  if(ac){ ac.innerHTML = ACCENT_PRESETS.map(c=>`
+    <div class="color-chip ${appear.accent===c?'active':''}" style="background:${c}" onclick="setAccent('${c}')"></div>`).join('');
+    document.getElementById('custom-accent').value = appear.accent;
+  }
+
+  // Font grid
+  const fg = document.getElementById('font-grid');
+  if(fg){ fg.innerHTML = FONTS.map(f=>`
+    <div class="font-swatch ${appear.fontId===f.id?'active':''}" onclick="setFont('${f.id}')">
+      <div class="fs-name">${f.name}</div>
+      <div class="fs-sample" style="font-family:${f.family}">${f.sample}</div>
+    </div>`).join(''); }
+
+  // Ranges
+  const rr = document.getElementById('radius-range');
+  if(rr){ rr.value=appear.radius; document.getElementById('radius-val').textContent=appear.radius+'px'; }
+  const fr = document.getElementById('fontsize-range');
+  if(fr){ fr.value=appear.fontSize; document.getElementById('fontsize-val').textContent=appear.fontSize+'px'; }
+
+  // App name
+  const an = document.getElementById('app-name-input');
+  if(an) an.value = appear.appName||'TimeSheet';
+
+  // Toggles
+  Object.keys(OPTS_DEFAULTS).forEach(k=>{
+    const el=document.getElementById('toggle-'+k);
+    if(el) el.classList.toggle('on', appear.opts[k]);
+  });
+
+  // Icon UI
+  buildIconUI();
+}
+
+function setTheme(id){
+  appear.themeId=id; applyAppearance(); buildAppearanceUI();
+  // re-mark active swatches
+  document.querySelectorAll('.theme-swatch').forEach((s,i)=>{
+    s.classList.toggle('active', THEMES[i].id===id);
+  });
+}
+
+function setAccent(c){
+  appear.accent=c; applyAppearance();
+  document.querySelectorAll('.color-chip').forEach((el,i)=>el.classList.toggle('active',ACCENT_PRESETS[i]===c));
+  document.getElementById('custom-accent').value=c;
+  const pvb=document.getElementById('pv-badge');
+  if(pvb){pvb.style.background=c+'22';pvb.style.color=c;}
+  buildIconUI();
+}
+
+function setFont(id){
+  appear.fontId=id; applyAppearance();
+  document.querySelectorAll('.font-swatch').forEach((s,i)=>s.classList.toggle('active',FONTS[i].id===id));
+}
+
+function setRadius(v){
+  appear.radius=parseInt(v);
+  document.getElementById('radius-val').textContent=v+'px';
+  applyAppearance();
+}
+
+function setFontSize(v){
+  appear.fontSize=parseInt(v);
+  document.getElementById('fontsize-val').textContent=v+'px';
+  applyAppearance();
+}
+
+function applyAppName(v){
+  appear.appName=v; applyAppearance();
+}
+
+function toggleOpt(key){
+  appear.opts[key]=!appear.opts[key];
+  document.getElementById('toggle-'+key).classList.toggle('on',appear.opts[key]);
+  applyAppearance(); renderAll();
+}
+
+init();
+</script>
+</body>
+</html>
