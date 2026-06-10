@@ -1,0 +1,998 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: https://cdoliveiracarlos-cell.github.io/timesheet/
+Subject: TimeSheet Pro
+Date: Wed, 10 Jun 2026 21:34:12 +0200
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--KXMwocX2Mnu59zDyvDYo0ky8Ql3CYK0Jz3JgTX077D----"
+
+
+------MultipartBoundary--KXMwocX2Mnu59zDyvDYo0ky8Ql3CYK0Jz3JgTX077D----
+Content-Type: text/html
+Content-ID: <frame-F08F2CA04C9635819FAA0E560D08951B@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://cdoliveiracarlos-cell.github.io/timesheet/
+
+<!DOCTYPE html><html lang="en" style="--bg: #0c0812; --surface: #141020; --surface2: #1c1830; --border: #2a2248; --text: #e8d8ff; --muted: #786898; --accent: #a0a8ff; --radius: 12px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="cid:css-1dffab94-cf4f-4f23-9f80-bfffc2a7574b@mhtml.blink" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TimeSheet Pro">
+<link rel="manifest" href="https://cdoliveiracarlos-cell.github.io/timesheet/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdoliveiracarlos-cell.github.io/timesheet/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdoliveiracarlos-cell.github.io/timesheet/icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://cdoliveiracarlos-cell.github.io/timesheet/icon-152.png">
+<link rel="shortcut icon" href="https://cdoliveiracarlos-cell.github.io/timesheet/favicon.ico">
+<title>TimeSheet Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Syne:wght@400;600;700;800&amp;family=Inter:wght@400;600;700;800&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Rajdhani:wght@400;600;700&amp;family=Orbitron:wght@400;700;800&amp;family=Nunito:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;family=Bebas+Neue&amp;family=Montserrat:wght@400;600;700;800&amp;display=swap">
+
+</head>
+<body style="font-family: Syne, sans-serif; font-size: 18px;">
+
+<!-- SETUP -->
+<div id="setup-screen" style="display: none;">
+  <div class="setup-box">
+    <h2>Time<span>Sheet</span> Pro Setup</h2>
+    <p>Connect to Google Sheets so your data syncs between all your devices. One-time setup, ~5 minutes.</p>
+    <div class="step-block"><span class="step-num">1</span>Open your Google Sheet → <b>Extensions → Apps Script</b> → paste the code → Save</div>
+    <div class="step-block"><span class="step-num">2</span>Click <b>Deploy → New deployment → Web App</b> → Execute as: Me, Access: Anyone → Deploy → copy the <code>/exec</code> URL</div>
+    <div class="step-block"><span class="step-num">3</span>Paste the URL below and click Connect</div>
+    <div class="show-code-link">📋 Show Apps Script code</div>
+    <div class="setup-inp">
+      <input id="setup-url" type="url" placeholder="https://script.google.com/macros/s/…/exec">
+      <button class="btn-setup">Connect &amp; Start →</button>
+    </div>
+    <div class="setup-skip">Skip — use offline only</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+    <div class="logo">TimeSheet<span> Pro</span></div>
+    <div style="font-size:0.52rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Created &amp; owned by <span style="color:var(--text);font-weight:600">Carlos de Oliveira</span></div>
+  </div>
+  <div class="header-right">
+    <div id="sync-badge" title="Tap to sync">
+      <div class="sync-dot err" id="sync-dot"></div>
+      <span id="sync-text">sync failed</span>
+    </div>
+    <div>
+      <div class="week-label" id="week-label">Week 24</div>
+      <div class="week-label" id="month-label">June 2026</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active">Dashboard</div>
+  <div class="nav-tab">Charts</div>
+  <div class="nav-tab">Log</div>
+  <div class="nav-tab">Report</div>
+  <div class="nav-tab">Settings</div>
+</div>
+
+<!-- ══ TAB: DASHBOARD ══ -->
+<div class="tab-panel active" id="tab-dashboard">
+  <div class="quick-bar">
+    <label>⚡ Quick Entry</label>
+    <div class="quick-row">
+      <select id="inp-customer"><option value="">— Customer —</option><option value="KSAT">KSAT</option><option value="Eutelsat Oneweb">Eutelsat Oneweb</option><option value="EGNOS V2">EGNOS V2</option><option value="CNES">CNES</option><option value="12M Antenna">12M Antenna</option><option value="MAXAR(AVENTOR)">MAXAR(AVENTOR)</option><option value="QZSS">QZSS</option><option value="SSC">SSC</option><option value="EGNOS V3">EGNOS V3</option><option value="KSAT HA10 AND HA11">KSAT HA10 AND HA11</option><option value="SANSA Frequency and timing references">SANSA Frequency and timing references</option><option value="HARTRAO">HARTRAO</option><option value="Intuitive Machines">Intuitive Machines</option><option value="Astroforge">Astroforge</option><option value="SpaceX">SpaceX</option></select>
+      <input id="inp-hours" type="number" min="0.25" max="24" step="0.25" placeholder="Hours">
+      <input id="inp-date" type="date">
+      <div class="note-wrap">
+        <input id="inp-note" type="text" placeholder="Note (optional)">
+        <button class="btn-mic" id="btn-mic" title="Tap to dictate note">🎙️</button>
+      </div>
+      <button class="btn-add">+ Log</button>
+    </div>
+  </div>
+  <div class="voice-hint">🎙️ Tap the mic to dictate your note by voice.</div>
+
+  <div class="stats-row">
+    <div class="stat-card yellow"><div class="val" id="stat-today">0h</div><div class="lbl">Today</div></div>
+    <div class="stat-card green"><div class="val" id="stat-week">14h</div><div class="lbl">This Week</div></div>
+    <div class="stat-card red"><div class="val" id="stat-month">67h30m</div><div class="lbl">This Month</div></div>
+    <div class="stat-card blue"><div class="val" id="stat-year">109h54m</div><div class="lbl">This Year</div></div>
+    <div class="stat-card" style="cursor:pointer;border-color:var(--muted)">
+      <div class="val" style="font-size:1.3rem;color:var(--muted)">⚙</div>
+      <div class="lbl">Customers</div>
+    </div>
+  </div>
+
+  <div class="section-title"><span>Customer Allocation — This Month</span></div>
+  <div class="customer-bars" id="customer-bars"><div class="cust-row">
+      <div class="cust-name" title="Eutelsat Oneweb">Eutelsat Oneweb</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:100.0%;background:#f0c040"></div></div>
+      <div class="cust-hours">37h</div>
+      <div class="cust-pct">55%</div>
+    </div><div class="cust-row">
+      <div class="cust-name" title="EGNOS V2">EGNOS V2</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:37.8%;background:#4af0b0"></div></div>
+      <div class="cust-hours">14h</div>
+      <div class="cust-pct">21%</div>
+    </div><div class="cust-row">
+      <div class="cust-name" title="KSAT">KSAT</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:29.7%;background:#f06080"></div></div>
+      <div class="cust-hours">11h</div>
+      <div class="cust-pct">16%</div>
+    </div><div class="cust-row">
+      <div class="cust-name" title="SSC">SSC</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:6.8%;background:#a0a8ff"></div></div>
+      <div class="cust-hours">2h30m</div>
+      <div class="cust-pct">4%</div>
+    </div><div class="cust-row">
+      <div class="cust-name" title="12M Antenna">12M Antenna</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:5.4%;background:#ff9f50"></div></div>
+      <div class="cust-hours">2h</div>
+      <div class="cust-pct">3%</div>
+    </div><div class="cust-row">
+      <div class="cust-name" title="MAXAR(AVENTOR)">MAXAR(AVENTOR)</div>
+      <div class="cust-bar-wrap"><div class="cust-bar-fill" style="width:2.7%;background:#80e0ff"></div></div>
+      <div class="cust-hours">1h</div>
+      <div class="cust-pct">1%</div>
+    </div></div>
+
+  <div class="section-title"><span>Recent Entries</span></div>
+  <div class="log-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Hours</th><th>Note</th><th></th><th></th></tr></thead>
+      <tbody id="recent-body"><tr>
+      <td>08 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">April ,May timesheet and register consolidation,data collection,review</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>09 Jun</td>
+      <td><span class="badge" style="background:#c0ff8022;color:#c0ff80">SSC</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">SSC MMS issues . Review email and SSC data. Discuss internally afterhours</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>09 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">8h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">set a lot of logistics updating of inventory sheet updating of smart sheet inventory updating RNA status faulty equipment status. New equipment receiving</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">1h30m</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Data docs prepare , shipment received</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">O hoing , relentless follow ups</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#c0ff8022;color:#c0ff80">SSC</span></td>
+      <td style="color:var(--accent);font-weight:700">1h30m</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Future GEO support compliance</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shipment resolve. Counter weights 1ton moved, greasing ,cleaning , grounding cabling reports for most SAPs.</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>04 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr></tbody>
+    </table>
+    <div class="empty" id="recent-empty" style="display:none">No entries yet.</div>
+  </div>
+</div>
+
+<!-- ══ TAB: CHARTS ══ -->
+<div class="tab-panel" id="tab-charts">
+  <div class="section-title"><span>Hours by Customer</span><span id="charts-period-label" style="color:var(--accent);font-size:0.65rem"></span></div>
+  <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <select id="chart-period" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:0.78rem;outline:none;">
+      <option value="month">This Month</option>
+      <option value="year" selected="">This Year (2026)</option>
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  <!-- DONUT -->
+  <div class="chart-wrap" id="donut-wrap"></div>
+
+  <!-- MONTHLY TREND -->
+  <div class="section-title"><span>Monthly Trend — 2026</span></div>
+  <div class="trend-wrap">
+    <div class="trend-chart">
+      <div class="bar-chart-inner" id="trend-bars"></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER BREAKDOWN -->
+  <div class="section-title"><span>Customer Breakdown</span></div>
+  <div class="customer-bars" id="chart-bars"></div>
+</div>
+
+<!-- ══ TAB: LOG ══ -->
+<div class="tab-panel" id="tab-log">
+  <div class="filter-row" style="padding-top:14px">
+    <select id="filter-customer"><option value="">All Customers</option><option value="KSAT">KSAT</option><option value="Eutelsat Oneweb">Eutelsat Oneweb</option><option value="EGNOS V2">EGNOS V2</option><option value="CNES">CNES</option><option value="12M Antenna">12M Antenna</option><option value="MAXAR(AVENTOR)">MAXAR(AVENTOR)</option><option value="QZSS">QZSS</option><option value="SSC">SSC</option><option value="EGNOS V3">EGNOS V3</option><option value="KSAT HA10 AND HA11">KSAT HA10 AND HA11</option><option value="SANSA Frequency and timing references">SANSA Frequency and timing references</option><option value="HARTRAO">HARTRAO</option><option value="Intuitive Machines">Intuitive Machines</option><option value="Astroforge">Astroforge</option><option value="SpaceX">SpaceX</option></select>
+    <select id="filter-period">
+      <option value="all">All Time</option>
+      <option value="week">This Week</option>
+      <option value="month" selected="">This Month</option>
+      <option value="year">This Year</option>
+    </select>
+    <button class="btn-export">↓ CSV</button>
+  </div>
+  <div class="log-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Hours</th><th>Note</th><th></th><th></th></tr></thead>
+      <tbody id="log-body"><tr>
+      <td>08 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">April ,May timesheet and register consolidation,data collection,review</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>09 Jun</td>
+      <td><span class="badge" style="background:#c0ff8022;color:#c0ff80">SSC</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted)">SSC MMS issues . Review email and SSC data. Discuss internally afterhours</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>09 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">8h</td>
+      <td style="color:var(--muted)">set a lot of logistics updating of inventory sheet updating of smart sheet inventory updating RNA status faulty equipment status. New equipment receiving</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">1h30m</td>
+      <td style="color:var(--muted)">Data docs prepare , shipment received</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted)">O hoing , relentless follow ups</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#c0ff8022;color:#c0ff80">SSC</span></td>
+      <td style="color:var(--accent);font-weight:700">1h30m</td>
+      <td style="color:var(--muted)">Future GEO support compliance</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>05 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">Shipment resolve. Counter weights 1ton moved, greasing ,cleaning , grounding cabling reports for most SAPs.</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>04 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">—</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>04 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">you can say we have installed new sfb module.Ongping support.inyo the night</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>04 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">—</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>04 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">4h</td>
+      <td style="color:var(--muted)">V2 line install and upgrade ,</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>03 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">2h</td>
+      <td style="color:var(--muted)">LER and LER , ALSO THE BT OPENSERVE LINE CHANGES</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>03 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">2h30m</td>
+      <td style="color:var(--muted)">SAP 06 , SAP 16 AND SAP 09</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#80e0ff22;color:#80e0ff">MAXAR(AVENTOR)</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted)">Remove faulty and old equipment -Jeff Adams</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted)">New line migration , setup TEAMS meeting ,internal discussion with Xolisa</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">3h</td>
+      <td style="color:var(--muted)">SAP 06 MOTOR REPLACE, TESTING , INVENTORY , RCU ON SAP 16 , MAINTENANCE COLLAGES</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#f0c04022;color:#f0c040">KSAT</span></td>
+      <td style="color:var(--accent);font-weight:700">5h</td>
+      <td style="color:var(--muted)">KSAT VISIT &amp; AVANTOR, HA5 feed control board replacement, SSPA communication</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#ff9f5022;color:#ff9f50">12M Antenna</span></td>
+      <td style="color:var(--accent);font-weight:700">2h</td>
+      <td style="color:var(--muted)">FOLLOW UP ON CSS BOARDS WITH SAFRAN, search new contacts, FEED ASSEMBLY</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>02 Jun</td>
+      <td><span class="badge" style="background:#f0608022;color:#f06080">EGNOS V2</span></td>
+      <td style="color:var(--accent);font-weight:700">1h</td>
+      <td style="color:var(--muted)">NEW LINE TEAMS meeting and routing internal discussion and prep. Old line was terminated</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>01 Jun</td>
+      <td><span class="badge" style="background:#4af0b022;color:#4af0b0">Eutelsat Oneweb</span></td>
+      <td style="color:var(--accent);font-weight:700">2h</td>
+      <td style="color:var(--muted)">SAP 06 Tilt TS and reporting</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr><tr>
+      <td>01 Jun</td>
+      <td><span class="badge" style="background:#f0c04022;color:#f0c040">KSAT</span></td>
+      <td style="color:var(--accent);font-weight:700">6h</td>
+      <td style="color:var(--muted)">KSAT and AVANTOR (JEFF ADAMS) VISIT. FIREWALL INSTALLATION , HA1 MAINT , HA5 TROUBLESHOOT</td>
+      <td class="td-act" title="Edit">✏️</td>
+      <td class="td-act" style="color:var(--muted)" title="Delete">✕</td>
+    </tr></tbody>
+    </table>
+    <div class="empty" id="empty-msg" style="display:none">No entries for this filter.</div>
+  </div>
+</div>
+
+<!-- ══ TAB: REPORT ══ -->
+<div class="tab-panel" id="tab-report">
+  <div style="padding:14px 14px 0">
+    <div class="report-controls">
+      <select id="report-year">
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+      </select>
+      <select id="report-month">
+        <option value="all">Full Year</option>
+        <option value="01">January</option><option value="02">February</option>
+        <option value="03">March</option><option value="04">April</option>
+        <option value="05">May</option><option value="06" selected="">June</option>
+        <option value="07">July</option><option value="08">August</option>
+        <option value="09">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <button class="btn-print">🖨 Print / PDF</button>
+    </div>
+    <div id="report-content"></div>
+  </div>
+</div>
+
+<!-- ══ TAB: SETTINGS ══ -->
+<div class="tab-panel" id="tab-settings">
+  <div style="padding:14px">
+
+    <!-- LIVE PREVIEW -->
+    <div class="appear-preview" id="appear-preview">
+      <div class="pv-title" id="pv-title">TimeSheet<span> Pro</span></div>
+      <div class="pv-sub">Preview updates live as you change settings</div>
+      <div class="pv-badge" id="pv-badge" style="background: rgba(160, 168, 255, 0.133); color: rgb(160, 168, 255);">Accent Color</div>
+    </div>
+
+    <!-- APP NAME -->
+    <div class="report-card">
+      <div class="appear-section">
+        <h4>App Name</h4>
+        <input class="app-name-input" id="app-name-input" type="text" placeholder="TimeSheet Pro">
+      </div>
+    </div>
+
+    <!-- THEMES -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Theme</h4>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+
+      <!-- ACCENT COLOR -->
+      <div class="appear-section">
+        <h4>Accent Color</h4>
+        <div class="color-row" id="accent-chips"></div>
+        <div class="custom-color">
+          <input type="color" id="custom-accent">
+          <label>Custom color</label>
+        </div>
+      </div>
+
+      <!-- FONT -->
+      <div class="appear-section">
+        <h4>Font</h4>
+        <div class="font-grid" id="font-grid"></div>
+      </div>
+
+      <!-- BORDER RADIUS -->
+      <div class="appear-section">
+        <h4>Corner Radius</h4>
+        <div class="range-row">
+          <input type="range" min="0" max="24" step="2" id="radius-range">
+          <span class="rv" id="radius-val">12px</span>
+        </div>
+      </div>
+
+      <!-- FONT SIZE -->
+      <div class="appear-section">
+        <h4>Base Font Size</h4>
+        <div class="range-row">
+          <input type="range" min="12" max="18" step="1" id="fontsize-range">
+          <span class="rv" id="fontsize-val">14px</span>
+        </div>
+      </div>
+
+      <!-- TOGGLES -->
+      <div class="appear-section">
+        <h4>Interface Options</h4>
+        <div class="setting-row">
+          <div><div class="setting-label">Compact Mode</div><div class="setting-sub">Tighter spacing, smaller cards</div></div>
+          <div class="toggle" id="toggle-compact"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Rounded Badges</div><div class="setting-sub">Pill-shaped customer labels</div></div>
+          <div class="toggle on" id="toggle-badges"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Animated Bars</div><div class="setting-sub">Smooth chart animations</div></div>
+          <div class="toggle on" id="toggle-anim"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Show % on Bars</div><div class="setting-sub">Percentage split per customer</div></div>
+          <div class="toggle on" id="toggle-pct"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYNC -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Google Sheets Sync</h4>
+        <input id="settings-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;margin-bottom:10px;">
+        <div style="display:flex;gap:8px">
+          <button class="btn-modal-add">Save URL</button>
+          <button class="btn-modal-close">Sync Now</button>
+        </div>
+        <div style="margin-top:10px">
+          <div class="show-code-link" style="text-align:left">📋 Show Apps Script code</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>Data Management</h4>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:10px" id="data-summary"></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-export">↓ Export CSV</button>
+          <label style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;">
+            ↑ Import CSV<input type="file" id="csv-import" accept=".csv" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICON / PWA -->
+    <div class="report-card" style="margin-top:10px">
+      <div class="appear-section">
+        <h4>🏠 App Icon &amp; Home Screen Install</h4>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Design your icon, download it, then follow the install steps to pin the app to your phone or desktop.</p>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Icon Style</div>
+          <div id="icon-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Background Color</div>
+          <div class="color-row" id="icon-bg-chips"></div>
+          <div class="custom-color">
+            <input type="color" id="icon-bg-custom">
+            <label>Custom background</label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px">
+          <div style="text-align:center">
+            <canvas id="icon-canvas" width="120" height="120" style="border-radius:26px;display:block;box-shadow:0 4px 24px rgba(0,0,0,0.5)"></canvas>
+            <div style="font-size:0.62rem;color:var(--muted);margin-top:6px">Large Preview</div>
+          </div>
+          <div style="text-align:center">
+            <canvas id="phone-icon" width="64" height="64" style="border-radius:15px;display:block;box-shadow:0 2px 10px rgba(0,0,0,0.5)"></canvas>
+            <div style="font-size:0.65rem;color:var(--text);font-weight:600;margin-top:5px" id="phone-label">TimeSheet</div>
+            <div style="font-size:0.58rem;color:var(--muted);margin-top:1px">Phone size</div>
+          </div>
+        </div>
+
+        <button class="btn-modal-add" style="width:100%;margin-bottom:12px">⬇ Download Icon PNG</button>
+
+        <div style="background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:12px;margin-bottom:8px">
+          <div style="font-size:0.7rem;font-weight:700;margin-bottom:8px;color:var(--accent)">📱 Android — Add to Home Screen</div>
+          <div style="font-size:0.72rem;color:var(--muted);line-height:1.9">
+            1. Open your Netlify URL in <b style="color:var(--text)">Chrome</b><br>
+            2. Tap <b style="color:var(--text)">⋮ menu → "Add to Home screen"</b><br>
+            3. Tap <b style="color:var(--text)">Add</b> — opens fullscreen like an app ✓<br>
+            <span style="color:var(--accent2)">To use custom icon:</span> Long-press shortcut → Edit → tap icon → Gallery → select downloaded PNG
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:12px;margin-bottom:8px">
+          <div style="font-size:0.7rem;font-weight:700;margin-bottom:8px;color:var(--accent2)">🖥 Windows Edge — Install as App</div>
+          <div style="font-size:0.72rem;color:var(--muted);line-height:1.9">
+            1. Open Netlify URL in <b style="color:var(--text)">Microsoft Edge</b><br>
+            2. Click <b style="color:var(--text)">⋯ menu → Apps → Install this site as an app</b><br>
+            3. Or click the <b style="color:var(--text)">install icon</b> in the address bar (screen + arrow)<br>
+            4. Opens in its own window, no browser bar ✓
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- CUSTOMER MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3>Manage Customers</h3>
+    <input id="new-cust-input" type="text" placeholder="New customer name...">
+    <div class="modal-btns">
+      <button class="btn-modal-add">Add</button>
+      <button class="btn-modal-close">Done</button>
+    </div>
+    <div id="cust-list" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <h3>Edit Entry</h3>
+    
+    <select id="edit-customer"><option value="KSAT">KSAT</option><option value="Eutelsat Oneweb">Eutelsat Oneweb</option><option value="EGNOS V2">EGNOS V2</option><option value="CNES">CNES</option><option value="12M Antenna">12M Antenna</option><option value="MAXAR(AVENTOR)">MAXAR(AVENTOR)</option><option value="QZSS">QZSS</option><option value="SSC">SSC</option><option value="EGNOS V3">EGNOS V3</option><option value="KSAT HA10 AND HA11">KSAT HA10 AND HA11</option><option value="SANSA Frequency and timing references">SANSA Frequency and timing references</option><option value="HARTRAO">HARTRAO</option><option value="Intuitive Machines">Intuitive Machines</option><option value="Astroforge">Astroforge</option><option value="SpaceX">SpaceX</option></select>
+    <input id="edit-hours" type="number" min="0.25" max="24" step="0.25" placeholder="Hours">
+    <input id="edit-date" type="date">
+    <input id="edit-note" type="text" placeholder="Note">
+    <div class="modal-btns">
+      <button class="btn-modal-add">Save</button>
+      <button class="btn-modal-close">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CODE MODAL -->
+<div class="modal-bg" id="code-modal">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <h3>📋 Apps Script Code</h3>
+    <p style="font-size:0.74rem;color:var(--muted);margin-bottom:10px">Copy → paste into script.google.com → Save → Deploy as Web App</p>
+    <textarea class="code-area" id="code-area" readonly=""></textarea>
+    <div class="modal-btns">
+      <button class="btn-modal-add">Copy Code</button>
+      <button class="btn-modal-close">Close</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+</body></html>
+------MultipartBoundary--KXMwocX2Mnu59zDyvDYo0ky8Ql3CYK0Jz3JgTX077D----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: cid:css-1dffab94-cf4f-4f23-9f80-bfffc2a7574b@mhtml.blink
+
+@charset "utf-8";
+
+:root { --bg: #0d0f14; --surface: #161820; --surface2: #1e2028; --border: #2a2d38; --accent: #f0c040; --accent2: #4af0b0; --accent3: #f06080; --text: #e8eaf0; --muted: #6b7080; --radius: 12px; }
+
+* { box-sizing: border-box; margin: 0px; padding: 0px; }
+
+body { background: var(--bg); color: var(--text); font-family: Syne, sans-serif; min-height: 100vh; padding: 0px 0px 120px; }
+
+.nav-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 57px; z-index: 90; overflow-x: auto; scrollbar-width: none; }
+
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab { padding: 10px 18px; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.2s; }
+
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-panel { display: none; }
+
+.tab-panel.active { display: block; }
+
+#setup-screen { position: fixed; inset: 0px; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+.setup-box { background: var(--surface); border: 1.5px solid var(--accent); border-radius: 18px; padding: 28px 24px; max-width: 460px; width: 100%; }
+
+.setup-box h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+
+.setup-box h2 span { color: var(--accent); }
+
+.setup-box p { font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+
+.step-block { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; font-size: 0.78rem; line-height: 1.65; }
+
+.step-num { display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: rgb(13, 15, 20); font-weight: 800; border-radius: 50%; width: 20px; height: 20px; font-size: 0.68rem; margin-right: 8px; flex-shrink: 0; }
+
+.step-block code { background: var(--surface2); color: var(--accent2); padding: 1px 6px; border-radius: 4px; font-family: "DM Mono", monospace; font-size: 0.74rem; }
+
+.step-block a { color: var(--accent); }
+
+.setup-inp { margin-top: 14px; display: flex; flex-direction: column; gap: 9px; }
+
+.setup-inp input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 11px 14px; font-family: "DM Mono", monospace; font-size: 0.82rem; outline: none; width: 100%; }
+
+.setup-inp input:focus { border-color: var(--accent); }
+
+.btn-setup { background: var(--accent); color: rgb(13, 15, 20); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 8px; padding: 12px; font-family: Syne, sans-serif; font-weight: 800; font-size: 0.95rem; cursor: pointer; width: 100%; }
+
+.setup-skip { text-align: center; margin-top: 10px; font-size: 0.72rem; color: var(--muted); cursor: pointer; text-decoration: underline; }
+
+.show-code-link { text-align: center; margin-top: 8px; font-size: 0.72rem; color: var(--accent2); cursor: pointer; text-decoration: underline; }
+
+#sync-badge { display: flex; align-items: center; gap: 5px; font-family: "DM Mono", monospace; font-size: 0.65rem; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); }
+
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+
+.sync-dot.ok { background: var(--accent2); }
+
+.sync-dot.err { background: var(--accent3); }
+
+.sync-dot.spin { animation: 1s ease 0s infinite normal none running pulse; background: var(--accent); }
+
+@keyframes pulse { 
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; position: sticky; top: 0px; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+.logo { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px; }
+
+.logo span { color: var(--accent); }
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.week-label { font-family: "DM Mono", monospace; font-size: 0.65rem; color: var(--muted); text-align: right; }
+
+.quick-bar { background: var(--surface); margin: 14px 14px 0px; border-radius: var(--radius); border: 1.5px solid var(--accent); padding: 14px 16px; }
+
+.quick-bar label { font-size: 0.65rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 10px; font-weight: 700; }
+
+.quick-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.quick-row input, .quick-row select { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-family: "DM Mono", monospace; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+
+.quick-row input:focus, .quick-row select:focus { border-color: var(--accent); }
+
+#inp-customer { flex: 1 1 0%; min-width: 130px; }
+
+#inp-hours { width: 80px; }
+
+#inp-date { width: 148px; }
+
+.note-wrap { display: flex; gap: 6px; flex: 2 1 0%; min-width: 120px; }
+
+#inp-note { flex: 1 1 0%; min-width: 0px; }
+
+.btn-mic { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; width: 42px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 1.1rem; padding: 0px; }
+
+.btn-mic:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-mic.listening { background: var(--accent3); border-color: var(--accent3); color: rgb(255, 255, 255); animation: 0.8s ease 0s infinite normal none running micpulse; }
+
+.btn-mic.granted { border-color: var(--accent2); color: var(--accent2); }
+
+@keyframes micpulse { 
+  0%, 100% { box-shadow: rgba(240, 96, 128, 0.5) 0px 0px 0px 0px; }
+  50% { box-shadow: rgba(240, 96, 128, 0) 0px 0px 0px 6px; }
+}
+
+.btn-add { background: var(--accent); color: rgb(13, 15, 20); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 8px; padding: 10px 20px; font-family: Syne, sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; }
+
+.btn-add:active { transform: scale(0.96); opacity: 0.85; }
+
+.voice-hint { font-family: "DM Mono", monospace; font-size: 0.68rem; color: var(--muted); margin: 7px 16px 0px; }
+
+.stats-row { display: flex; gap: 10px; padding: 14px 14px 0px; overflow-x: auto; scrollbar-width: none; }
+
+.stats-row::-webkit-scrollbar { display: none; }
+
+.stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 13px 16px; min-width: 120px; flex-shrink: 0; }
+
+.stat-card .val { font-size: 1.7rem; font-weight: 800; line-height: 1; margin-bottom: 3px; }
+
+.stat-card .lbl { font-size: 0.6rem; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+
+.stat-card.yellow .val { color: var(--accent); }
+
+.stat-card.green .val { color: var(--accent2); }
+
+.stat-card.red .val { color: var(--accent3); }
+
+.stat-card.blue .val { color: rgb(128, 200, 255); }
+
+.section-title { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 18px 16px 10px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+
+.customer-bars { padding: 0px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+.cust-row { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 11px 14px; display: flex; align-items: center; gap: 12px; }
+
+.cust-name { font-weight: 700; font-size: 0.85rem; width: 130px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.cust-bar-wrap { flex: 1 1 0%; background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; }
+
+.cust-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+.cust-hours { font-family: "DM Mono", monospace; font-size: 0.78rem; color: var(--accent); width: 55px; text-align: right; flex-shrink: 0; }
+
+.cust-pct { font-family: "DM Mono", monospace; font-size: 0.7rem; color: var(--muted); width: 38px; text-align: right; flex-shrink: 0; }
+
+.chart-wrap { padding: 0px 14px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+.donut-svg { flex-shrink: 0; }
+
+.donut-legend { display: flex; flex-direction: column; gap: 7px; flex: 1 1 0%; min-width: 140px; }
+
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.legend-name { flex: 1 1 0%; font-weight: 600; font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.legend-val { font-family: "DM Mono", monospace; font-size: 0.72rem; color: var(--muted); }
+
+.trend-wrap { padding: 0px 14px; }
+
+.trend-chart { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; overflow-x: auto; }
+
+.bar-chart-inner { display: flex; align-items: flex-end; gap: 6px; height: 120px; min-width: 280px; }
+
+.bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1 1 0%; min-width: 32px; }
+
+.bar-col-fill { width: 100%; border-radius: 4px 4px 0px 0px; transition: height 0.4s; min-height: 2px; }
+
+.bar-col-lbl { font-family: "DM Mono", monospace; font-size: 0.6rem; color: var(--muted); white-space: nowrap; }
+
+.bar-col-val { font-family: "DM Mono", monospace; font-size: 0.6rem; color: var(--accent); }
+
+.log-wrap { padding: 0px 14px; overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-family: "DM Mono", monospace; font-size: 0.78rem; }
+
+th { text-align: left; color: var(--muted); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding: 8px 10px; }
+
+td { padding: 9px 10px; border-bottom: 1px solid var(--surface2); vertical-align: middle; }
+
+tr:last-child td { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; }
+
+tr:hover td { background: var(--surface2); }
+
+.td-act { cursor: pointer; color: var(--muted); text-align: center; transition: color 0.15s; font-size: 0.85rem; }
+
+.td-act:hover { color: var(--accent); }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+
+.filter-row { display: flex; gap: 8px; padding: 0px 14px 12px; flex-wrap: wrap; }
+
+.filter-row select { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 7px 12px; font-family: "DM Mono", monospace; font-size: 0.78rem; outline: none; }
+
+.btn-export { background: var(--surface2); color: var(--accent2); border: 1px solid var(--accent2); border-radius: 8px; padding: 7px 14px; font-family: Syne, sans-serif; font-weight: 700; font-size: 0.78rem; cursor: pointer; }
+
+.report-wrap { padding: 0px 14px; }
+
+.report-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+
+.report-controls select { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; font-family: "DM Mono", monospace; font-size: 0.8rem; outline: none; }
+
+.btn-print { background: var(--accent); color: rgb(13, 15, 20); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 8px; padding: 8px 18px; font-family: Syne, sans-serif; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+
+.report-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+
+.report-card h3 { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+.report-table { width: 100%; border-collapse: collapse; font-family: "DM Mono", monospace; font-size: 0.8rem; }
+
+.report-table th { text-align: left; color: var(--muted); font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding: 6px 8px; }
+
+.report-table td { padding: 8px; border-bottom: 1px solid var(--surface2); }
+
+.report-table tr:last-child td { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; font-weight: 700; color: var(--accent); }
+
+.report-total { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+
+.report-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+.empty { text-align: center; color: var(--muted); padding: 30px 20px; font-size: 0.85rem; }
+
+#toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--accent); color: rgb(13, 15, 20); padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; z-index: 999; transition: transform 0.3s; pointer-events: none; }
+
+#toast.show { transform: translateX(-50%) translateY(0px); }
+
+.modal-bg { display: none; position: fixed; inset: 0px; background: rgba(0, 0, 0, 0.75); z-index: 200; align-items: flex-end; justify-content: center; }
+
+.modal-bg.open { display: flex; }
+
+.modal { background: var(--surface); border-radius: 18px 18px 0px 0px; border-top-color: ; border-top-style: ; border-top-width: ; border-right-color: ; border-right-style: ; border-right-width: ; border-left-color: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; padding: 24px 20px 40px; width: 100%; max-width: 480px; }
+
+.modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+
+.modal input, .modal select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 14px; font-family: "DM Mono", monospace; font-size: 0.85rem; outline: none; margin-bottom: 10px; }
+
+.modal-btns { display: flex; gap: 10px; }
+
+.btn-modal-add { flex: 1 1 0%; background: var(--accent); color: rgb(13, 15, 20); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 8px; padding: 10px; font-weight: 700; font-family: Syne, sans-serif; cursor: pointer; }
+
+.btn-modal-close { flex: 1 1 0%; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-weight: 700; font-family: Syne, sans-serif; cursor: pointer; }
+
+.cust-list-item { display: flex; align-items: center; gap: 10px; padding: 6px 0px; border-bottom: 1px solid var(--border); font-family: "DM Mono", monospace; font-size: 0.82rem; }
+
+.cust-list-item span { flex: 1 1 0%; }
+
+.cust-list-item button { background: none; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; color: var(--accent3); cursor: pointer; }
+
+textarea.code-area { width: 100%; height: 240px; background: var(--bg); color: var(--accent2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: "DM Mono", monospace; font-size: 0.68rem; resize: none; outline: none; margin-bottom: 10px; }
+
+.appear-section { margin-bottom: 22px; }
+
+.appear-section h4 { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 700; }
+
+.theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+.theme-swatch { border-radius: 10px; padding: 10px 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; text-align: center; }
+
+.theme-swatch.active { border-color: var(--accent); }
+
+.theme-swatch .sw-name { font-size: 0.65rem; font-weight: 700; margin-top: 5px; }
+
+.theme-swatch .sw-dots { display: flex; gap: 3px; justify-content: center; margin-top: 3px; }
+
+.theme-swatch .sw-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.font-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+.font-swatch { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: border-color 0.2s; }
+
+.font-swatch.active { border-color: var(--accent); }
+
+.font-swatch .fs-name { font-size: 0.7rem; color: var(--muted); margin-bottom: 2px; }
+
+.font-swatch .fs-sample { font-size: 1rem; font-weight: 700; }
+
+.color-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.color-chip { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.15s; flex-shrink: 0; }
+
+.color-chip.active { border-color: var(--text); transform: scale(1.18); }
+
+.custom-color { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+
+.custom-color input[type="color"] { width: 40px; height: 32px; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; padding: 2px; }
+
+.custom-color label { font-size: 0.72rem; color: var(--muted); }
+
+.range-row { display: flex; align-items: center; gap: 12px; }
+
+.range-row input[type="range"] { flex: 1 1 0%; accent-color: var(--accent); }
+
+.range-row .rv { font-family: "DM Mono", monospace; font-size: 0.75rem; color: var(--accent); width: 36px; }
+
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0px; border-bottom: 1px solid var(--border); }
+
+.setting-row:last-child { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; }
+
+.setting-label { font-size: 0.82rem; font-weight: 600; }
+
+.setting-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+.toggle { width: 44px; height: 24px; background: var(--surface2); border-radius: 12px; cursor: pointer; position: relative; border: 1px solid var(--border); transition: background 0.2s; flex-shrink: 0; }
+
+.toggle.on { background: var(--accent2); }
+
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: rgb(255, 255, 255); transition: transform 0.2s; }
+
+.toggle.on::after { transform: translateX(20px); }
+
+.app-name-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; font-family: inherit; font-size: 0.85rem; font-weight: 700; outline: none; width: 100%; }
+
+.app-name-input:focus { border-color: var(--accent); }
+
+.appear-preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; text-align: center; }
+
+.appear-preview .pv-title { font-size: 1.1rem; font-weight: 800; }
+
+.appear-preview .pv-title span { color: var(--accent); }
+
+.appear-preview .pv-sub { font-size: 0.7rem; color: var(--muted); font-family: "DM Mono", monospace; margin-top: 4px; }
+
+.appear-preview .pv-badge { display: inline-block; margin-top: 8px; padding: 3px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+
+body.compact .stat-card { padding: 8px 12px; min-width: 100px; }
+
+body.compact .stat-card .val { font-size: 1.3rem; }
+
+body.compact .cust-row { padding: 7px 12px; }
+
+body.compact td, body.compact th { padding: 5px 8px; }
+
+body.compact .quick-bar { padding: 10px 12px; }
+
+@media print {
+  header, .nav-tabs, .quick-bar, .voice-hint, .stats-row, .filter-row, #toast, .modal-bg, #setup-screen, .btn-print, .btn-export { display: none !important; }
+  body { background: rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 0px; }
+  .report-card { border: 1px solid rgb(204, 204, 204); background: rgb(255, 255, 255); break-inside: avoid; }
+  .report-table td, .report-table th { color: rgb(0, 0, 0); }
+  #tab-report { display: block !important; }
+}
+
+@media (max-width: 480px) {
+  .quick-row { flex-direction: column; }
+  #inp-customer, #inp-hours, #inp-date, .note-wrap { width: 100%; }
+  .btn-add { width: 100%; padding: 12px; }
+  .chart-wrap { flex-direction: column; }
+}
+------MultipartBoundary--KXMwocX2Mnu59zDyvDYo0ky8Ql3CYK0Jz3JgTX077D------
