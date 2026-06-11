@@ -14,35 +14,4 @@
     { "src": "icon-152.png", "sizes": "152x152", "type": "image/png" },
     { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" }
   ]
-}{
-  "name": "TimeSheet Pro",
-  "short_name": "TimeSheet",
-  "description": "Time tracking app by Carlos de Oliveira",
-  "start_url": "/timesheet/",
-  "scope": "/timesheet/",
-  "display": "standalone",
-  "background_color": "#050d1a",
-  "theme_color": "#0d0f14",
-  "orientation": "portrait-primary",
-  "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-152.png", "sizes": "152x152", "type": "image/png" },
-    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" }
-  ]
-}{
-  "name": "TimeSheet Pro",
-  "short_name": "TimeSheet",
-  "description": "Time tracking app by Carlos de Oliveira",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#050d1a",
-  "theme_color": "#0d0f14",
-  "orientation": "portrait-primary",
-  "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-152.png", "sizes": "152x152", "type": "image/png" },
-    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" }
-  ]
 }
